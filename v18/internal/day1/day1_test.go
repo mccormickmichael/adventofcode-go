@@ -24,7 +24,7 @@ func TestSum(t *testing.T) {
     }
 }
 
-func TestScan(t *testing.T) {
+func TestParse(t *testing.T) {
     expected := []int{1, -2, 3, 1}
     source := `+1
 -2

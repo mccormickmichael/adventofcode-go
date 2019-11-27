@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/mccormickmichael/adventofcode-go/v18/internal/day1"
+	"github.com/mccormickmichael/adventofcode-go/v18/internal/day2"
 	"github.com/mccormickmichael/adventofcode-go/v18/internal/event"
 )
 
