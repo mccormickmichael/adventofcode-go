@@ -9,7 +9,17 @@ type Day interface {
 	Part2()
 }
 
-type DayThing struct {
+type nilDay struct {
+	string
+}
+func (n nilDay) Part1() {}
+func (n nilDay) Part2() {}
+
+func NilDay() Day{
+	return nilDay{"bogus"}
+}
+
+type Solvable struct {
 	Path string
 	Output io.Writer
 }

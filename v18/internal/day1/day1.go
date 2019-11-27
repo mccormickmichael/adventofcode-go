@@ -3,21 +3,20 @@ package day1
 import (
     "bufio"
     "fmt"
-    "github.com/mccormickmichael/adventofcode-go/v18/internal/event"
     "io"
     "log"
     "os"
     "strconv"
+
+    "github.com/mccormickmichael/adventofcode-go/v18/internal/event"
 )
 
-type Day1 struct {
-    event.DayThing
+type Day1 event.Solvable
+
+func New(path string, output io.Writer) event.Day {
+    return Day1{Path: path, Output: output}
 }
 
-
-func New(path string, output io.Writer) *Day1 {
-    return &Day1{event.DayThing{Path: path, Output: output}}
-}
 func (d Day1) Part1() {
     value := Sum(scan(d.Path))
     _, _ = fmt.Fprintf(d.Output, "Resulting frequency [%d]\n", value)

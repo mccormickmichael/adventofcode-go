@@ -23,20 +23,28 @@ func main() {
 		path = os.Args[2]
 	}
 
-	var d event.Day
+	d := event.NilDay()
 
 	switch day {
-	case 1:
-		d = day1.New(path, os.Stdout)
+	case 1: d = day1.New(path, os.Stdout)
+	case 2:	d = day2.New(path, os.Stdout)
 	default:
-		log.Fatalf("Day %d is not implemented.", day)
+		bail(fmt.Sprintf("Day %d is not implemented.", day))
 	}
-	fmt.Printf("Day %d of Advent of Code 2018:\n", day)
+	fmt.Printf("Day %2d of Advent of Code 2018:\n", day)
+	fmt.Println("------------------------------")
+	fmt.Println("Part 1:")
 	d.Part1()
+	fmt.Println()
+	fmt.Println("Part 2:")
 	d.Part2()
 }
 
-func usage() {
-	_, _ = fmt.Fprintf(os.Stderr, "Usage: aoc18 <day> [input file path]")
+func bail(message string) {
+	_, _ = fmt.Fprintf(os.Stderr, message)
 	os.Exit(1)
+}
+
+func usage() {
+	bail("Usage: aoc18 <day> [input file path]")
 }
