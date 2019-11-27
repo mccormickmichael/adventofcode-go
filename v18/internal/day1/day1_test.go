@@ -13,7 +13,7 @@ func TestSum(t *testing.T) {
         expected int
     }{
         {[]int{1, 2, 3}, 6},
-        { []int{+1, -2, +3, +1}, 3},
+        {[]int{+1, -2, +3, +1}, 3},
     }
 
     for _, c := range cases {

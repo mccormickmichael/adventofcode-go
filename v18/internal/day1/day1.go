@@ -3,19 +3,29 @@ package day1
 import (
     "bufio"
     "fmt"
+    "github.com/mccormickmichael/adventofcode-go/v18/internal/event"
+    "io"
     "log"
     "os"
     "strconv"
 )
 
-func Part1(path string) {
-    value := Sum(scan(path))
-    fmt.Println(value)
+type Day1 struct {
+    event.DayThing
 }
 
-func Part2(path string) {
-    value, index := Dup(scan(path))
-    fmt.Printf("Duplicate frequency [%d] at index %d\n", value, index)
+
+func New(path string, output io.Writer) *Day1 {
+    return &Day1{event.DayThing{Path: path, Output: output}}
+}
+func (d Day1) Part1() {
+    value := Sum(scan(d.Path))
+    _, _ = fmt.Fprintf(d.Output, "Resulting frequency [%d]\n", value)
+}
+
+func (d Day1) Part2() {
+    value, index := Dup(scan(d.Path))
+    _, _ = fmt.Fprintf(d.Output, "Duplicate frequency [%d] at index %d\n", value, index)
 }
 
 func scan(path string) []int {
