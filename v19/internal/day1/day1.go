@@ -76,9 +76,7 @@ func calculateFuelForMassAndFuel(mass int) int {
 }
 
 func calculateFuelForFuel(fuelMass int) int {
-	if fuelMass < 6 {
-		return 0
-	}
+	
 	additionalFuel := calculateFuelForMass(fuelMass)
 	return additionalFuel + calculateFuelForFuel(additionalFuel)
 }
