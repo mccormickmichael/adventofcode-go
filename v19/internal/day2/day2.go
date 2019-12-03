@@ -28,8 +28,8 @@ func (d Day2) Part1() {
 
 	values := scan(d.Path)
 	_, _ = fmt.Fprintf(d.Output, "Value count: %d", len(values))
-	preset(values)
-	count, err := run(values);
+	preset(values, 12, 2)
+	count, err := run(values)
 	if err != nil {
 		_, _ = fmt.Fprintf(d.Output, "Unxepected error: %s", err)
 		return
@@ -38,12 +38,29 @@ func (d Day2) Part1() {
 }	
 
 func (d Day2) Part2() {
-	_, _ = fmt.Fprintf(d.Output, "Unimplemented!\n")
+	originalValues := scan(d.Path)
+	preset(originalValues, 12, 2)
+	for noun := 0; noun <= 99; noun++ {
+		for verb := 0; verb <= 99; verb++ {
+			values := make([]int, len(originalValues))
+			copy(values, originalValues)
+			preset(values, noun, verb)
+
+			if _, err := run(values); err != nil {
+				log.Fatalf("Unexpected error at noun:%d, verb:%d", noun, verb)
+			}
+			if values[0] == 19690720 {
+				_, _ = fmt.Fprintf(d.Output, "noun: %d verb: %d answer %d\n", noun, verb, noun * 100 + verb)
+				return
+			}
+		}
+	}
+	_, _ = fmt.Fprintf(d.Output, "Did not find any input pair that produced 19690720!\n")
 }
 
-func preset(values []int) {
-	values[1] = 12
-	values[2] = 2
+func preset(values []int, noun, verb int) {
+	values[1] = noun
+	values[2] = verb
 }
 
 func run(values []int) (int, error) {
@@ -51,7 +68,7 @@ func run(values []int) (int, error) {
 	for i := 0; i < len(values); i += 4 {
 		op := Op{values[i], values[i+1], values[i+2], values[i+3]}
 		if op.code == 99 {
-			log.Printf("values[%d]==99, halting", i)
+			//log.Printf("values[%d]==99, halting", i)
 			return count, nil
 		}
 		if err := op.execute(values); err != nil {
