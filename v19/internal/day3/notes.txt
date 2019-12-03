@@ -1,0 +1,23 @@
+How to approach:
+
+The wires consist of a series of line segments. Using the directions, construct a set of line segments for each wire. Segment endpoints are ordered smallest to largest
+
+For each segment in wire A, identify if any of the segments in wire B intersect that segment. This is O(n^2) with line segments, which aren't that many.
+
+This yields a list of intersections. The closest one has the minimum value of |X| + |Y|
+
+How to get the intersection point? Each line segment knows its start and end point, and whether it is Vertical or Horizonal.
+
+A(V), B(H) -> A.x, B.y if B.x0 <= A.x <= B.x1 AND A.y0 <= B.y <= A.y1.
+A(H), B(V) -> Swap A and B and do above. I only care about the intersecting point.
+
+
+A(V), B(V) -> A.x != B.x ? No intersection
+A(H), B(H) -> A.y != B.y ? No intersection
+
+A(V), B(V) -> A.x == B.x ? AND (A.y1 < B.y0 OR B.y1 < A.y0) No intersection
+A(H), B(H) -> A.y == B.y ? AND (A.x1 < B.x0 OR B.x1 < A.x0) No intersection
+
+A(V), B(V) -> Sort so A.y0 < B.y0 Intersection is A.x, B.y0
+A(H), B(H) -> Sort so A.x0 < B.x0 Intersection is A.x0, B.y
+
