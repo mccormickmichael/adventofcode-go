@@ -17,3 +17,7 @@
 
 # Input files are secret!
 input/
+
+# executables
+aoc18
+aoc19

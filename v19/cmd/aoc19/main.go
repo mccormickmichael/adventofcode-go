@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/mccormickmichael/adventofcode-go/v19/internal/day2"
 	"log"
 	"os"
 	"strconv"
 
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/event"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day1"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/day2"
 )
 
 func main() {
