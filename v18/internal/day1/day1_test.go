@@ -34,7 +34,7 @@ func TestParse(t *testing.T) {
 
     actual := parse(scanner)
     if !Equal(actual, expected) {
-        t.Errorf("parse(%s) == %d, expected %d", source, actual, expected)
+        t.Errorf("input(%s) == %d, expected %d", source, actual, expected)
     }
 }
 

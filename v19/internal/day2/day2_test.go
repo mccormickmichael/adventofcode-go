@@ -1,6 +1,7 @@
 package day2
 
 import (
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/test"
 	"testing"
 )
 
@@ -14,7 +15,7 @@ func TestParse(t *testing.T) {
 
 	for _, c := range cases {
 		actual := parse(c.input)
-		if !equalIntSlice(actual, c.expected) {
+		if !test.EqualIntSlice(actual, c.expected) {
 			t.Errorf("TestParse(%s) == %c, expected %c", c.input, actual, c.expected)
 		}
 	}
@@ -59,18 +60,4 @@ func testRun(t *testing.T) {
 			t.Errorf("run(%c) == %d at %d, expected %d", c.values, actual, c.index, c.expected)
 		}
 	}
-}
-	
-
-
-func equalIntSlice(lhs, rhs []int) bool {
-    if len(lhs) != len(rhs) {
-        return false
-    }
-    for i, v := range lhs {
-        if v != rhs[i] {
-            return false
-        }
-    }
-    return true
 }
