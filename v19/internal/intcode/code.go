@@ -89,5 +89,5 @@ type ErrStep struct {
 	cause error
 }
 func (e ErrStep) Error() string {
-	return fmt.Sprintf("Error executing step %d: %s\nDump: PC:%d Heap:%c", e.count, e.cause, e.pc, e.mem)
+	return fmt.Sprintf("Error executing step %d: %s\nDump: PC:%d Heap:%v", e.count, e.cause, e.pc, e.mem)
 }

@@ -52,6 +52,52 @@ func TestInputOutput(t *testing.T) {
 	}
 }
 
+func TestJumpCompareRun(t *testing.T) {
+	cases := []struct {
+		program []int
+		input int
+		expectedOutput int
+	}{
+		{[]int{3,9,8,9,10,9,4,9,99,-1,8}, 8, 1},
+		{[]int{3,9,8,9,10,9,4,9,99,-1,8}, 5, 0},
+		{[]int{3,9,7,9,10,9,4,9,99,-1,8}, 5, 1},
+		{[]int{3,9,7,9,10,9,4,9,99,-1,8}, 9, 0},
+		{[]int{3,3,1108,-1,8,3,4,3,99}, 8,1},
+		{[]int{3,3,1108,-1,8,3,4,3,99}, 5,0},
+		{[]int{3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9},0,0},
+		{[]int{3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9},1,1},
+		{[]int{3,3,1105,-1,9,1101,0,0,12,4,12,99,1},0,0},
+		{[]int{3,3,1105,-1,9,1101,0,0,12,4,12,99,1},1,1},
+		{[]int{
+			3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
+			1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
+			999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99},
+			7,999},
+		{[]int{
+			3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
+			1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
+			999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99},
+			8,1000},
+		{[]int{
+			3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
+			1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
+			999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99},
+			9,1001},
+	}
+	for _, c := range cases {
+		ic := New(c.program)
+		ic.SetInput(c.input)
+		err := ic.Run()
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+		actualOutput := ic.Output()
+		if actualOutput != c.expectedOutput {
+			t.Errorf("Run(%v)(%d) output %d, expected %d %v", c.program, c.input, actualOutput, c.expectedOutput, ic.mem)
+		}
+	}
+}
+
 func TestRun(t *testing.T) {
 	cases := []struct {
 		values []int
@@ -92,3 +138,15 @@ func TestParseModes(t *testing.T) {
 		}
 	}
 }
+
+//func TestJumpOp struct {
+//	cases := []struct {
+//		program []int
+//		p0, p1 int
+//		dest int
+//		modes int
+//		expected int
+//	}{
+//		{[]int{0}, }
+//	}
+//}

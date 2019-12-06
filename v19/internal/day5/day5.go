@@ -20,12 +20,20 @@ func (d Day5) Part1() {
 	ic.SetInput(1)
 	err := ic.Run()
 	if err != nil {
-		_, _ = fmt.Fprintf(d.Output, "Unexpected error: %s", err)
+		_, _ = fmt.Fprintf(d.Output, "Unexpected error: %s\n", err)
 		return
 	}
-	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d", ic.Output())
+	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d\n", ic.Output())
 }
 
 func (d Day5) Part2() {
-	_, _ = fmt.Fprintf(d.Output, "Unimplemented!\n")
+	program := input.ParseInts(input.SingleLineFile(d.Path))
+	ic := intcode.New(program)
+	ic.SetInput(5)
+	err := ic.Run()
+	if err != nil {
+		_, _ = fmt.Fprintf(d.Output, "Unexpected error: %s\n", err)
+		return
+	}
+	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d\n", ic.Output())
 }

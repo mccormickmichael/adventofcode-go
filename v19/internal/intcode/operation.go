@@ -24,6 +24,14 @@ func operation(memory []int, ip int) Operation {
 		op = Input{memory[ip+1], modes}
 	case 4:
 		op = Output{memory[ip+1], modes}
+	case 5:
+		op = JumpOp{memory[ip+1], true, memory[ip+2], modes}
+	case 6:
+		op = JumpOp{memory[ip+1], false, memory[ip+2], modes}
+	case 7:
+		op = LtCmpOp{memory[ip+1], memory[ip+2], memory[ip+3], modes}
+	case 8:
+		op = EqCmpOp{memory[ip+1], memory[ip+2], memory[ip+3], modes}
 	default:
 		op = ErrOpcode{opcode}
 	}
@@ -122,6 +130,30 @@ type CmpOp struct {
 	p1    int
 	dest  int
 	modes Modes
+}
+
+type LtCmpOp CmpOp
+func (c LtCmpOp) ex(ic *Intcode) (int, error) {
+	val0 := ic.Mpeek(c.p0, c.modes.Mode(0))
+	val1 := ic.Mpeek(c.p1, c.modes.Mode(1))
+	if val0 < val1 {
+		ic.Poke(c.dest, 1)
+	} else {
+		ic.Poke(c.dest, 0)
+	}
+	return 3, nil
+}
+
+type EqCmpOp CmpOp
+func (c EqCmpOp) ex(ic *Intcode) (int, error) {
+	val0 := ic.Mpeek(c.p0, c.modes.Mode(0))
+	val1 := ic.Mpeek(c.p1, c.modes.Mode(1))
+	if val0 == val1 {
+		ic.Poke(c.dest, 1)
+	} else {
+		ic.Poke(c.dest, 0)
+	}
+	return 3, nil
 }
 
 type ErrOutOfRange struct {
