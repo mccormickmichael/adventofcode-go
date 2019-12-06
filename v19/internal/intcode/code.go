@@ -41,6 +41,13 @@ func (ic *Intcode) Peek(index int) int {
 	return ic.mem[index]
 }
 
+func (ic *Intcode) Mpeek(index int, mode int) int {
+	switch mode {
+	case 1:  return index
+	default: return ic.mem[index]
+	}
+}
+
 func (ic *Intcode) Poke(index int, value int) {
 	ic.mem[index] = value
 }

@@ -10,21 +10,41 @@ type Operation interface {
 
 func operation(memory []int, ip int) Operation {
 	var op Operation
-	switch opcode := memory[ip]; opcode {
+	value := memory[ip]
+	opcode := value % 100
+	modes := ParseModes(value)
+	switch opcode {
 	case 99:
 		op = Halt{}
 	case 1:
-		op = Add{memory[ip+1], memory[ip+2], memory[ip+3]}
+		op = Add{memory[ip+1], memory[ip+2], memory[ip+3], modes}
 	case 2:
-		op = Mul{memory[ip+1], memory[ip+2], memory[ip+3]}
+		op = Mul{memory[ip+1], memory[ip+2], memory[ip+3], modes}
 	case 3:
-		op = Input{memory[ip+1]}
+		op = Input{memory[ip+1], modes}
 	case 4:
-		op = Output{memory[ip+1]}
+		op = Output{memory[ip+1], modes}
 	default:
 		op = ErrOpcode{opcode}
 	}
 	return op
+}
+
+type Modes []int
+func ParseModes(instruction int) Modes {
+	modes := make(Modes, 0)
+	v := instruction/ 100
+	for v != 0 {
+		modes = append(modes, v % 10)
+		v = v / 10
+	}
+	return modes
+}
+func (m Modes) Mode(i int) int {
+	if i < len(m) {
+		return m[i]
+	}
+	return 0
 }
 
 type ErrOpcode struct {
@@ -44,52 +64,42 @@ func (h Halt) ex(ic *Intcode) (int, error) {
 }
 
 type Binop struct {
-	id1, id2 int
+	id0, id1 int
 	result   int
+	modes    Modes
 }
 
 type Add Binop
 func (a Add) ex(ic *Intcode) (int, error) {
-	if ok := ensureLength(ic.mem, ic.pc+3); ok {
-		ic.mem[a.result] = ic.mem[a.id1] + ic.mem[a.id2]
-		return 3, nil
-	}
-	return 0, ErrOutOfRange{ic, 3}
+	val0 := ic.Mpeek(a.id0, a.modes.Mode(0))
+	val1 := ic.Mpeek(a.id1, a.modes.Mode(1))
+	ic.Poke(a.result, val0 + val1)
+	return 3, nil
 }
 
 type Mul Binop
 func (a Mul) ex(ic *Intcode) (int, error) {
-	if ok := ensureLength(ic.mem, ic.pc+3); ok {
-		ic.mem[a.result] = ic.mem[a.id1] * ic.mem[a.id2]
-		return 3, nil
-	}
-	return 0, ErrOutOfRange{ic, 3}
+	val0 := ic.Mpeek(a.id0, a.modes.Mode(0))
+	val1 := ic.Mpeek(a.id1, a.modes.Mode(1))
+	ic.Poke(a.result, val0 * val1)
+	return 3, nil
 }
 
 type Ioop struct {
 	index int
+	modes  Modes
 }
 
 type Input Ioop
 func (i Input) ex(ic *Intcode) (int, error) {
-	if ok := ensureLength(ic.mem, ic.pc+1); ok {
-		ic.mem[i.index] = ic.input
+		ic.Poke(i.index, ic.input)
 		return 1, nil
-	}
-	return 0, ErrOutOfRange{ic, 1}
 }
 
 type Output Ioop
 func (o Output) ex(ic *Intcode) (int, error) {
-	if ok := ensureLength(ic.mem, ic.pc+1); ok {
-		ic.output = ic.mem[o.index]
+		ic.output = ic.Mpeek(o.index, o.modes.Mode(0))
 		return 1, nil
-	}
-	return 0, ErrOutOfRange{ic, 1}
-}
-
-func ensureLength(mem []int, max int) bool {
-	return len(mem) > max
 }
 
 type ErrOutOfRange struct {
