@@ -17,6 +17,10 @@ func operation(memory []int, ip int) Operation {
 		op = Add{memory[ip+1], memory[ip+2], memory[ip+3]}
 	case 2:
 		op = Mul{memory[ip+1], memory[ip+2], memory[ip+3]}
+	case 3:
+		op = Input{memory[ip+1]}
+	case 4:
+		op = Output{memory[ip+1]}
 	default:
 		op = ErrOpcode{opcode}
 	}
@@ -39,27 +43,49 @@ func (h Halt) ex(ic *Intcode) (int, error) {
 	return 0, nil
 }
 
-type Binop struct{
+type Binop struct {
 	id1, id2 int
-	out int
+	result   int
 }
 
 type Add Binop
 func (a Add) ex(ic *Intcode) (int, error) {
-	if ok := ensureLength(ic.mem, ic.pc+2); ok {
-		ic.mem[a.out] = ic.mem[a.id1] + ic.mem[a.id2]
+	if ok := ensureLength(ic.mem, ic.pc+3); ok {
+		ic.mem[a.result] = ic.mem[a.id1] + ic.mem[a.id2]
 		return 3, nil
 	}
-	return 0, ErrOutOfRange{len(ic.mem), ic.pc, 3}
+	return 0, ErrOutOfRange{ic, 3}
 }
 
 type Mul Binop
 func (a Mul) ex(ic *Intcode) (int, error) {
-	if ok := ensureLength(ic.mem, ic.pc+2); ok {
-		ic.mem[a.out] = ic.mem[a.id1] * ic.mem[a.id2]
+	if ok := ensureLength(ic.mem, ic.pc+3); ok {
+		ic.mem[a.result] = ic.mem[a.id1] * ic.mem[a.id2]
 		return 3, nil
 	}
-	return 0, ErrOutOfRange{len(ic.mem), ic.pc, 3}
+	return 0, ErrOutOfRange{ic, 3}
+}
+
+type Ioop struct {
+	index int
+}
+
+type Input Ioop
+func (i Input) ex(ic *Intcode) (int, error) {
+	if ok := ensureLength(ic.mem, ic.pc+1); ok {
+		ic.mem[i.index] = ic.input
+		return 1, nil
+	}
+	return 0, ErrOutOfRange{ic, 1}
+}
+
+type Output Ioop
+func (o Output) ex(ic *Intcode) (int, error) {
+	if ok := ensureLength(ic.mem, ic.pc+1); ok {
+		ic.output = ic.mem[o.index]
+		return 1, nil
+	}
+	return 0, ErrOutOfRange{ic, 1}
 }
 
 func ensureLength(mem []int, max int) bool {
@@ -67,8 +93,9 @@ func ensureLength(mem []int, max int) bool {
 }
 
 type ErrOutOfRange struct {
-	max, pc, need int
+	ic *Intcode
+	need int
 }
 func (e ErrOutOfRange) Error() string {
-	return fmt.Sprintf("Program Counter out of range: pc:%d, limit:%d, needed:%d", e.pc, e.max, e.need)
+	return fmt.Sprintf("Program Counter result of range: pc:%d, limit:%d, needed:%d", e.ic.Pc(), e.ic.Len(), e.need)
 }

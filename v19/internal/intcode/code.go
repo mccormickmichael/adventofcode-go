@@ -7,12 +7,22 @@ type Intcode struct {
 	pc int
 	count int
 	halt bool
+	input int
+	output int
 }
 
 func New(values []int) *Intcode  {
 	v := make([]int, len(values))
 	copy(v, values)
 	return &Intcode{mem: v}
+}
+
+func (ic *Intcode) SetInput(input int) {
+	ic.input = input
+}
+
+func (ic *Intcode) Output() int {
+	return ic.output
 }
 
 func (ic *Intcode) Len() int {

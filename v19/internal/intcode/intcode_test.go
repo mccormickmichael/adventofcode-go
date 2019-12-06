@@ -25,6 +25,29 @@ func TestAdd(t *testing.T) {
 	}
 }
 
+func TestInputOutput(t *testing.T) {
+	cases := []struct {
+		program []int
+		input int
+		expectedOutput int
+	}{
+		{[]int{3,0,4,0,99}, 5, 5},
+		{[]int{3,0,4,0,99}, 7, 7},
+	}
+	for _, c := range cases {
+		ic := New(c.program)
+		ic.SetInput(c.input)
+		err := ic.Run()
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+		actual := ic.Output()
+		if actual != c.expectedOutput {
+			t.Errorf("Run(%v) yielded %d, expected %d [%v]", c.program, actual, c.expectedOutput, ic.mem)
+		}
+	}
+}
+
 func TestRun(t *testing.T) {
 	cases := []struct {
 		values []int
