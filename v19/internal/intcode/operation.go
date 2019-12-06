@@ -102,6 +102,28 @@ func (o Output) ex(ic *Intcode) (int, error) {
 		return 1, nil
 }
 
+type JumpOp struct {
+	value  int
+	nonzero bool
+	dest    int
+	modes   Modes
+}
+func (j JumpOp) ex(ic *Intcode) (int, error) {
+	val := ic.Mpeek(j.value, j.modes.Mode(0))
+	if (val != 0) == j.nonzero {
+		ic.SetPc(ic.Mpeek(j.dest, j.modes.Mode(1)))
+		return 0, nil
+	}
+	return 2, nil
+}
+
+type CmpOp struct {
+	p0    int
+	p1    int
+	dest  int
+	modes Modes
+}
+
 type ErrOutOfRange struct {
 	ic *Intcode
 	need int

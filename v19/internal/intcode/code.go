@@ -33,6 +33,10 @@ func (ic *Intcode) Pc() int {
 	return ic.pc
 }
 
+func (ic *Intcode) SetPc(newPc int) {
+	ic.pc = newPc
+}
+
 func (ic *Intcode) Count() int {
 	return ic.count
 }
