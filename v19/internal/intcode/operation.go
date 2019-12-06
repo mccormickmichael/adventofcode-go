@@ -8,15 +8,15 @@ type Operation interface {
 	ex(*Intcode) (int, error)
 }
 
-func operation(memory []int, instructionPointer int) Operation {
+func operation(memory []int, ip int) Operation {
 	var op Operation
-	switch opcode := memory[instructionPointer]; opcode {
+	switch opcode := memory[ip]; opcode {
 	case 99:
 		op = Halt{}
 	case 1:
-		op = Add{}
+		op = Add{memory[ip+1], memory[ip+2], memory[ip+3]}
 	case 2:
-		op = Mul{}
+		op = Mul{memory[ip+1], memory[ip+2], memory[ip+3]}
 	default:
 		op = ErrOpcode{opcode}
 	}
@@ -39,19 +39,24 @@ func (h Halt) ex(ic *Intcode) (int, error) {
 	return 0, nil
 }
 
-type Add struct{}
+type Binop struct{
+	id1, id2 int
+	out int
+}
+
+type Add Binop
 func (a Add) ex(ic *Intcode) (int, error) {
 	if ok := ensureLength(ic.mem, ic.pc+2); ok {
-		ic.mem[ic.pc+2] = ic.mem[ic.pc] + ic.mem[ic.pc+1]
+		ic.mem[a.out] = ic.mem[a.id1] + ic.mem[a.id2]
 		return 3, nil
 	}
 	return 0, ErrOutOfRange{len(ic.mem), ic.pc, 3}
 }
 
-type Mul struct{}
+type Mul Binop
 func (a Mul) ex(ic *Intcode) (int, error) {
 	if ok := ensureLength(ic.mem, ic.pc+2); ok {
-		ic.mem[ic.pc+2] = ic.mem[ic.pc] * ic.mem[ic.pc+1]
+		ic.mem[a.out] = ic.mem[a.id1] * ic.mem[a.id2]
 		return 3, nil
 	}
 	return 0, ErrOutOfRange{len(ic.mem), ic.pc, 3}
