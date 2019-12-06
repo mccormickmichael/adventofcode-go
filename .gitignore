@@ -16,7 +16,7 @@
 *~
 
 # Input files are secret!
-input/
+*input.txt
 
 # executables
 aoc18

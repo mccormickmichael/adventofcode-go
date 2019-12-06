@@ -25,9 +25,9 @@ func operation(memory []int, ip int) Operation {
 	case 4:
 		op = Output{memory[ip+1], modes}
 	case 5:
-		op = JumpOp{memory[ip+1], true, memory[ip+2], modes}
+		op = JumpTrueOp{memory[ip+1], memory[ip+2], modes}
 	case 6:
-		op = JumpOp{memory[ip+1], false, memory[ip+2], modes}
+		op = JumpFalseOp{memory[ip+1], memory[ip+2], modes}
 	case 7:
 		op = LtCmpOp{memory[ip+1], memory[ip+2], memory[ip+3], modes}
 	case 8:
@@ -112,13 +112,24 @@ func (o Output) ex(ic *Intcode) (int, error) {
 
 type JumpOp struct {
 	value  int
-	nonzero bool
 	dest    int
 	modes   Modes
 }
-func (j JumpOp) ex(ic *Intcode) (int, error) {
+
+type JumpTrueOp JumpOp
+func (j JumpTrueOp) ex(ic *Intcode) (int, error) {
 	val := ic.Mpeek(j.value, j.modes.Mode(0))
-	if (val != 0) == j.nonzero {
+	if val != 0 {
+		ic.SetPc(ic.Mpeek(j.dest, j.modes.Mode(1)))
+		return 0, nil
+	}
+	return 2, nil
+}
+
+type JumpFalseOp JumpOp
+func (j JumpFalseOp) ex(ic *Intcode) (int, error) {
+	val := ic.Mpeek(j.value, j.modes.Mode(0))
+	if val == 0 {
 		ic.SetPc(ic.Mpeek(j.dest, j.modes.Mode(1)))
 		return 0, nil
 	}
