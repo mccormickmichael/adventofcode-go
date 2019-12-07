@@ -5,6 +5,7 @@ import (
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day3"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day4"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day5"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/day6"
 	"log"
 	"os"
 	"strconv"
@@ -22,7 +23,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Expected numeric value for first argument, got %s", os.Args[1])
 	}
-	path := fmt.Sprintf("input/day%d.txt", day)
+	path := fmt.Sprintf("day%d.input.txt", day)
 	if len(os.Args) > 2 {
 		path = os.Args[2]
 	}
@@ -35,6 +36,7 @@ func main() {
 	case 3: d = day3.New(path, os.Stdout)
 	case 4: d = day4.New(152085, 670283, os.Stdout)
 	case 5: d = day5.New(path, os.Stdout)
+	case 6: d = day6.New(path, os.Stdout)
 	default:
 		bail(fmt.Sprintf("Day %d is not implemented.\n", day))
 	}
