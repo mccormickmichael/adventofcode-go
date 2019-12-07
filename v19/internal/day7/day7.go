@@ -32,7 +32,19 @@ func (d Day7) Part1() {
 }
 
 func (d Day7) Part2() {
-	_, _ = fmt.Fprintf(d.Output, "Unimplemented!\n")
+	var maxOutput int
+	var maxOutputPhase [5]int
+
+	phases := EnumeratePhases([]int{5, 6, 7, 8, 9})
+	program := input.ParseInts(input.SingleLineFile(d.Path))
+	for _, p := range phases {
+		output := Amplify(p, program)
+		if output > maxOutput {
+			maxOutput = output
+			maxOutputPhase = p
+		}
+	}
+	_, _ = fmt.Fprintf(d.Output, "Max Output %d at Phase %v\n", maxOutput, maxOutputPhase)
 }
 
 // This is a terrible way to do this.
@@ -68,14 +80,16 @@ func Amplify(phase [5]int, program []int) int {
 	bc := make(chan int, 2)
 	cd := make(chan int, 2)
 	de := make(chan int, 2)
-	eo := make(chan int)
+	ea := make(chan int, 2)
+
+	ehalt := make(chan bool)
 
 	ics := []*intcode.Intcode{
-		intcode.Builder(program).WithOutput(ab).Build(),
+		intcode.Builder(program).WithInput(ea).WithOutput(ab).Build(),
 		intcode.Builder(program).WithInput(ab).WithOutput(bc).Build(),
 		intcode.Builder(program).WithInput(bc).WithOutput(cd).Build(),
 		intcode.Builder(program).WithInput(cd).WithOutput(de).Build(),
-		intcode.Builder(program).WithInput(de).WithOutput(eo).Build(),
+		intcode.Builder(program).WithInput(de).WithOutput(ea).WithHalt(ehalt).Build(),
 	}
 	for i, ic := range ics {
 		go ic.GoRun()
@@ -83,8 +97,10 @@ func Amplify(phase [5]int, program []int) int {
 	}
 	ics[0].SetInput(0)
 
+	<- ehalt
+
 	var output int
-	for output = range eo {}
+	for output = range ea {}
 
 	for amp, ic := range ics {
 		if err := ic.Error(); err != nil {
