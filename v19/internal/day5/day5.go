@@ -15,6 +15,8 @@ func New(path string, output io.Writer) event.Day {
 }
 
 func (d Day5) Part1() {
+	// TODO: This deadlocks Intcode by pushing too much output.
+	// TODO: Move this to a goroutine and report on the last output
 	program := input.ParseInts(input.SingleLineFile(d.Path))
 	ic := intcode.New(program)
 	ic.SetInput(1)

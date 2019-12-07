@@ -67,7 +67,7 @@ func (e ErrOpcode) Error() string {
 type Halt struct{}
 
 func (h Halt) ex(ic *Intcode) int {
-	ic.halted = true
+	ic.Halt()
 	return 0
 }
 

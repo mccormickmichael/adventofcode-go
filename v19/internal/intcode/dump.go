@@ -25,5 +25,5 @@ func Dump(ic *Intcode) {
 			b.WriteString(strconv.Itoa(m))
 		}
 	}
-	_, _ = fmt.Fprintln(ic.Dump, b.String())
+	_, _ = fmt.Fprintln(ic.dump, b.String())
 }

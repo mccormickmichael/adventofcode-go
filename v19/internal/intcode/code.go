@@ -7,22 +7,18 @@ import (
 
 type Intcode struct {
 	mem    []int
-	pc     int
-	count  int
-	halted bool
 	input  chan int
 	output chan int
 	halt   chan bool
-	Dump io.Writer
+	dump   io.Writer
+	pc     int
+	count  int
+	halted bool
+	error  error
 }
 
 func New(values []int) *Intcode  {
-	v := make([]int, len(values))
-	copy(v, values)
-	input := make(chan int, 3)
-	output := make(chan int, 10)
-	halt := make(chan bool)
-	return &Intcode{mem: v, input: input, output: output, halt: halt}
+	return Builder(values).Build()
 }
 
 func (ic *Intcode) SetInput(input ...int) {
@@ -41,6 +37,10 @@ func (ic *Intcode) PushOutput(value int) {
 
 func (ic *Intcode) PopOutput() int {
 	return <- ic.output
+}
+
+func (ic *Intcode) Halt() {
+	ic.halted = true
 }
 
 func (ic *Intcode) Len() int {
@@ -74,16 +74,20 @@ func (ic *Intcode) Poke(index int, value int) {
 	ic.mem[index] = value
 }
 
+func (ic *Intcode) GoRun() {
+	err := ic.Run()
+	ic.error = err
+	ic.halt <- true
+}
+
 func (ic *Intcode) Run() error {
 	if DumpFlag { Dump(ic) }
 	for !ic.halted {
 		if err := ic.Step(); err != nil {
 			ic.halted = true
-			close(ic.output)
 			return err
 		}
 	}
-	close(ic.output)
 	return nil
 }
 

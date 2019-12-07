@@ -41,12 +41,9 @@ func (d Day2) Part1() {
 
 func (d Day2) Part2() {
 	originalValues := scan(d.Path)
-	//preset(originalValues, 12, 2)
 	for noun := 0; noun <= 99; noun++ {
 		for verb := 0; verb <= 99; verb++ {
-			values := make([]int, len(originalValues))
-			copy(values, originalValues)
-			ic := intcode.New(values)
+			ic := intcode.Builder(originalValues).Build()
 			ic.Poke(1, noun)
 			ic.Poke(2, verb)
 
