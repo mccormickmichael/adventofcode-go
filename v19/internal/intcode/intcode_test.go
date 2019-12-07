@@ -138,15 +138,3 @@ func TestParseModes(t *testing.T) {
 		}
 	}
 }
-
-//func TestJumpOp struct {
-//	cases := []struct {
-//		program []int
-//		p0, p1 int
-//		dest int
-//		modes int
-//		expected int
-//	}{
-//		{[]int{0}, }
-//	}
-//}

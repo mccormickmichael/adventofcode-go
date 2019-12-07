@@ -39,11 +39,12 @@ func operation(memory []int, ip int) Operation {
 }
 
 type Modes []int
+
 func ParseModes(instruction int) Modes {
 	modes := make(Modes, 0)
-	v := instruction/ 100
+	v := instruction / 100
 	for v != 0 {
-		modes = append(modes, v % 10)
+		modes = append(modes, v%10)
 		v = v / 10
 	}
 	return modes
@@ -58,6 +59,7 @@ func (m Modes) Mode(i int) int {
 type ErrOpcode struct {
 	opcode int
 }
+
 func (e ErrOpcode) ex(ic *Intcode) (int, error) {
 	return 0, e
 }
@@ -66,6 +68,7 @@ func (e ErrOpcode) Error() string {
 }
 
 type Halt struct{}
+
 func (h Halt) ex(ic *Intcode) (int, error) {
 	ic.halt = true
 	return 0, nil
@@ -78,45 +81,50 @@ type Binop struct {
 }
 
 type Add Binop
+
 func (a Add) ex(ic *Intcode) (int, error) {
 	val0 := ic.Mpeek(a.id0, a.modes.Mode(0))
 	val1 := ic.Mpeek(a.id1, a.modes.Mode(1))
-	ic.Poke(a.result, val0 + val1)
+	ic.Poke(a.result, val0+val1)
 	return 3, nil
 }
 
 type Mul Binop
+
 func (a Mul) ex(ic *Intcode) (int, error) {
 	val0 := ic.Mpeek(a.id0, a.modes.Mode(0))
 	val1 := ic.Mpeek(a.id1, a.modes.Mode(1))
-	ic.Poke(a.result, val0 * val1)
+	ic.Poke(a.result, val0*val1)
 	return 3, nil
 }
 
 type Ioop struct {
 	index int
-	modes  Modes
+	modes Modes
 }
 
 type Input Ioop
+
 func (i Input) ex(ic *Intcode) (int, error) {
-		ic.Poke(i.index, ic.input)
-		return 1, nil
+	ic.Poke(i.index, ic.PopInput())
+	return 1, nil
 }
 
 type Output Ioop
+
 func (o Output) ex(ic *Intcode) (int, error) {
-		ic.output = ic.Mpeek(o.index, o.modes.Mode(0))
-		return 1, nil
+	ic.output = ic.Mpeek(o.index, o.modes.Mode(0))
+	return 1, nil
 }
 
 type JumpOp struct {
-	value  int
-	dest    int
-	modes   Modes
+	value int
+	dest  int
+	modes Modes
 }
 
 type JumpTrueOp JumpOp
+
 func (j JumpTrueOp) ex(ic *Intcode) (int, error) {
 	val := ic.Mpeek(j.value, j.modes.Mode(0))
 	if val != 0 {
@@ -127,6 +135,7 @@ func (j JumpTrueOp) ex(ic *Intcode) (int, error) {
 }
 
 type JumpFalseOp JumpOp
+
 func (j JumpFalseOp) ex(ic *Intcode) (int, error) {
 	val := ic.Mpeek(j.value, j.modes.Mode(0))
 	if val == 0 {
@@ -144,6 +153,7 @@ type CmpOp struct {
 }
 
 type LtCmpOp CmpOp
+
 func (c LtCmpOp) ex(ic *Intcode) (int, error) {
 	val0 := ic.Mpeek(c.p0, c.modes.Mode(0))
 	val1 := ic.Mpeek(c.p1, c.modes.Mode(1))
@@ -156,6 +166,7 @@ func (c LtCmpOp) ex(ic *Intcode) (int, error) {
 }
 
 type EqCmpOp CmpOp
+
 func (c EqCmpOp) ex(ic *Intcode) (int, error) {
 	val0 := ic.Mpeek(c.p0, c.modes.Mode(0))
 	val1 := ic.Mpeek(c.p1, c.modes.Mode(1))
@@ -168,9 +179,10 @@ func (c EqCmpOp) ex(ic *Intcode) (int, error) {
 }
 
 type ErrOutOfRange struct {
-	ic *Intcode
+	ic   *Intcode
 	need int
 }
+
 func (e ErrOutOfRange) Error() string {
 	return fmt.Sprintf("Program Counter result of range: pc:%d, limit:%d, needed:%d", e.ic.Pc(), e.ic.Len(), e.need)
 }

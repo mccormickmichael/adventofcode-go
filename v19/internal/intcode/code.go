@@ -10,7 +10,7 @@ type Intcode struct {
 	pc int
 	count int
 	halt bool
-	input int
+	input []int
 	output int
 	Dump io.Writer
 }
@@ -21,8 +21,14 @@ func New(values []int) *Intcode  {
 	return &Intcode{mem: v}
 }
 
-func (ic *Intcode) SetInput(input int) {
+func (ic *Intcode) SetInput(input ...int) {
 	ic.input = input
+}
+
+func (ic *Intcode) PopInput() int {
+	val := ic.input[0]
+	ic.input = ic.input[1:]
+	return val
 }
 
 func (ic *Intcode) Output() int {
