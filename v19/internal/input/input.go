@@ -2,6 +2,7 @@ package input
 
 import (
 	"bufio"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -18,10 +19,13 @@ func SingleLineFile(path string) string {
 }
 
 func ParseInts(s string) []int {
-	tokens := strings.Split(s, ",")
+	tokens := strings.Split(strings.TrimSpace(s), ",")
 	values := make([]int, len(tokens))
 	for i, t := range tokens {
-		v, _ := strconv.Atoi(t)
+		v, err := strconv.Atoi(t)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Unable to convert %s to int", t) )
+		}
 		values[i] = v
 	}
 	return values

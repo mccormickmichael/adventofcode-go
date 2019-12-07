@@ -1,6 +1,9 @@
 package intcode
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
 type Intcode struct {
 	mem []int
@@ -9,6 +12,7 @@ type Intcode struct {
 	halt bool
 	input int
 	output int
+	Dump io.Writer
 }
 
 func New(values []int) *Intcode  {
@@ -57,6 +61,7 @@ func (ic *Intcode) Poke(index int, value int) {
 }
 
 func (ic *Intcode) Run() error {
+	if DumpFlag { Dump(ic) }
 	for !ic.halt {
 		if err := ic.Step(); err != nil {
 			ic.halt = true
@@ -75,6 +80,7 @@ func (ic *Intcode) Step() error {
 	}
 	ic.count++
 	ic.pc += adv
+	if DumpFlag { Dump(ic) }
 	return nil
 }
 
