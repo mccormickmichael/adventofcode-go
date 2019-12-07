@@ -43,6 +43,10 @@ func (ic *Intcode) Halt() {
 	ic.halted = true
 }
 
+func (ic *Intcode) Error() error {
+	return ic.error
+}
+
 func (ic *Intcode) Len() int {
 	return len(ic.mem)
 }
@@ -78,6 +82,7 @@ func (ic *Intcode) GoRun() {
 	err := ic.Run()
 	ic.error = err
 	ic.halt <- true
+	close(ic.output)
 }
 
 func (ic *Intcode) Run() error {

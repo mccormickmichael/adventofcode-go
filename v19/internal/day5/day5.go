@@ -15,27 +15,35 @@ func New(path string, output io.Writer) event.Day {
 }
 
 func (d Day5) Part1() {
-	// TODO: This deadlocks Intcode by pushing too much output.
-	// TODO: Move this to a goroutine and report on the last output
 	program := input.ParseInts(input.SingleLineFile(d.Path))
-	ic := intcode.New(program)
+	o := make(chan int)
+	ic := intcode.Builder(program).WithOutput(o).Build()
 	ic.SetInput(1)
-	err := ic.Run()
-	if err != nil {
+
+	var output int
+	go ic.GoRun()
+	for output = range o {}
+
+	if err := ic.Error(); err != nil {
 		_, _ = fmt.Fprintf(d.Output, "Unexpected error: %s\n", err)
 		return
 	}
-	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d in %d instructions\n", ic.PopOutput(), ic.Count())
+	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d in %d instructions\n", output, ic.Count())
 }
 
 func (d Day5) Part2() {
 	program := input.ParseInts(input.SingleLineFile(d.Path))
-	ic := intcode.New(program)
+	o := make(chan int)
+	ic := intcode.Builder(program).WithOutput(o).Build()
 	ic.SetInput(5)
-	err := ic.Run()
-	if err != nil {
+
+	var output int
+	go ic.GoRun()
+	for output = range o {}
+
+	if err := ic.Error(); err != nil {
 		_, _ = fmt.Fprintf(d.Output, "Unexpected error: %s\n", err)
 		return
 	}
-	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d in %d instructions\n", ic.PopOutput(), ic.Count())
+	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d in %d instructions\n", output, ic.Count())
 }

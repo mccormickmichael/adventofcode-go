@@ -31,6 +31,7 @@ func (d Day2) Part1() {
 	ic := intcode.New(values)
 	ic.Poke(1, 12)
 	ic.Poke(2, 2)
+
 	err := ic.Run()
 	if err != nil {
 		_, _ = fmt.Fprintf(d.Output, "Unxepected error: %s", err)
