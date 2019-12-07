@@ -64,14 +64,33 @@ func EnumeratePhases(r0 []int) [][5]int {
 }
 
 func Amplify(phase [5]int, program []int) int {
-	signal := 0
-	for amp, ps := range phase {
-		ic := intcode.New(program)
-		ic.SetInput(ps, signal)
-		if err := ic.Run(); err != nil {
+	ab := make(chan int, 2)
+	bc := make(chan int, 2)
+	cd := make(chan int, 2)
+	de := make(chan int, 2)
+	eo := make(chan int)
+
+	ics := []*intcode.Intcode{
+		intcode.Builder(program).WithOutput(ab).Build(),
+		intcode.Builder(program).WithInput(ab).WithOutput(bc).Build(),
+		intcode.Builder(program).WithInput(bc).WithOutput(cd).Build(),
+		intcode.Builder(program).WithInput(cd).WithOutput(de).Build(),
+		intcode.Builder(program).WithInput(de).WithOutput(eo).Build(),
+	}
+	for i, ic := range ics {
+		go ic.GoRun()
+		ic.SetInput(phase[i])
+	}
+	ics[0].SetInput(0)
+
+	var output int
+	for output = range eo {}
+
+	for amp, ic := range ics {
+		if err := ic.Error(); err != nil {
 			log.Fatalf("Unexpected error at phase %v amp %d: %v", phase, amp, err)
 		}
-		signal = ic.PopOutput()
 	}
-	return signal
+
+	return output
 }
