@@ -23,7 +23,7 @@ func (d Day5) Part1() {
 		_, _ = fmt.Fprintf(d.Output, "Unexpected error: %s\n", err)
 		return
 	}
-	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d in %d instructions\n", ic.Output(), ic.Count())
+	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d in %d instructions\n", ic.PopOutput(), ic.Count())
 }
 
 func (d Day5) Part2() {
@@ -35,5 +35,5 @@ func (d Day5) Part2() {
 		_, _ = fmt.Fprintf(d.Output, "Unexpected error: %s\n", err)
 		return
 	}
-	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d in %d instructions\n", ic.Output(), ic.Count())
+	_, _ = fmt.Fprintf(d.Output, "Diagnostic Code: %d in %d instructions\n", ic.PopOutput(), ic.Count())
 }

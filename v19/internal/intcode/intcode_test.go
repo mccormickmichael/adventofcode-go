@@ -20,7 +20,7 @@ func TestAdd(t *testing.T) {
 	for _, c := range cases {
 		ic := New(c.program)
 		a := Add{c.id1, c.id2, c.result, ParseModes(c.modes)}
-		_, _ = a.ex(ic)
+		_ = a.ex(ic)
 		actual := ic.Peek(0)
 		if actual != c.expected {
 			t.Errorf("Add(%d, %d, %d, %v) == %d, expected %d %v", c.id1, c.id2, c.result, c.modes, actual, c.expected, ic.mem)
@@ -45,7 +45,7 @@ func TestInputOutput(t *testing.T) {
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
-		actual := ic.Output()
+		actual := ic.PopOutput()
 		if actual != c.expectedOutput {
 			t.Errorf("Run(%v) yielded %d, expected %d [%v]", c.program, actual, c.expectedOutput, ic.mem)
 		}
@@ -91,7 +91,7 @@ func TestJumpCompareRun(t *testing.T) {
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
-		actualOutput := ic.Output()
+		actualOutput := ic.PopOutput()
 		if actualOutput != c.expectedOutput {
 			t.Errorf("Run(%v)(%d) output %d, expected %d %v", c.program, c.input, actualOutput, c.expectedOutput, ic.mem)
 		}

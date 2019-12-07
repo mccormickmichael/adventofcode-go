@@ -6,33 +6,41 @@ import (
 )
 
 type Intcode struct {
-	mem []int
-	pc int
-	count int
-	halt bool
-	input []int
-	output int
+	mem    []int
+	pc     int
+	count  int
+	halted bool
+	input  chan int
+	output chan int
+	halt   chan bool
 	Dump io.Writer
 }
 
 func New(values []int) *Intcode  {
 	v := make([]int, len(values))
 	copy(v, values)
-	return &Intcode{mem: v}
+	input := make(chan int, 3)
+	output := make(chan int, 10)
+	halt := make(chan bool)
+	return &Intcode{mem: v, input: input, output: output, halt: halt}
 }
 
 func (ic *Intcode) SetInput(input ...int) {
-	ic.input = input
+	for _, i := range input {
+		ic.input <- i
+	}
 }
 
 func (ic *Intcode) PopInput() int {
-	val := ic.input[0]
-	ic.input = ic.input[1:]
-	return val
+	return <- ic.input
 }
 
-func (ic *Intcode) Output() int {
-	return ic.output
+func (ic *Intcode) PushOutput(value int) {
+	ic.output <- value
+}
+
+func (ic *Intcode) PopOutput() int {
+	return <- ic.output
 }
 
 func (ic *Intcode) Len() int {
@@ -68,22 +76,24 @@ func (ic *Intcode) Poke(index int, value int) {
 
 func (ic *Intcode) Run() error {
 	if DumpFlag { Dump(ic) }
-	for !ic.halt {
+	for !ic.halted {
 		if err := ic.Step(); err != nil {
-			ic.halt = true
+			ic.halted = true
+			close(ic.output)
 			return err
 		}
 	}
+	close(ic.output)
 	return nil
 }
 
 func (ic *Intcode) Step() error {
-	op := operation(ic.mem, ic.pc)
-	ic.pc++
-	adv, err := op.ex(ic)
+	op, err := operation(ic.mem, ic.pc)
 	if err != nil {
 		return ic.StepError(err)
 	}
+	ic.pc++
+	adv := op.ex(ic)
 	ic.count++
 	ic.pc += adv
 	if DumpFlag { Dump(ic) }

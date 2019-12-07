@@ -23,7 +23,6 @@ func (d Day7) Part1() {
 	program := input.ParseInts(input.SingleLineFile(d.Path))
 	for _, p := range phases {
 		output := Amplify(p, program)
-		_, _ = fmt.Fprintf(d.Output, "Max: %d, Current: %d %v\n", maxOutput, output, p)
 		if output > maxOutput {
 			maxOutput = output
 			maxOutputPhase = p
@@ -72,7 +71,7 @@ func Amplify(phase [5]int, program []int) int {
 		if err := ic.Run(); err != nil {
 			log.Fatalf("Unexpected error at phase %v amp %d: %v", phase, amp, err)
 		}
-		signal = ic.Output()
+		signal = ic.PopOutput()
 	}
 	return signal
 }
