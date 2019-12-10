@@ -23,7 +23,7 @@ func (d Day9) Part1() {
 	go ic.GoRun()
 
 	for o := range oc {
-		_, _ = fmt.Fprintf(d.Output, "Keycode: %d\n", o)
+		_, _ = fmt.Fprintf(d.Output, "Keycode: %d in %d instructions with memory %d\n", o, ic.Count(), ic.Len())
 	}
 	if err := ic.Error(); err != nil {
 		_, _ = fmt.Fprintf(d.Output, "Unexpected err %v\n", err)
@@ -39,7 +39,7 @@ func (d Day9) Part2() {
 	go ic.GoRun()
 
 	for o := range oc {
-		_, _ = fmt.Fprintf(d.Output, "Coordinate: %d\n", o)
+		_, _ = fmt.Fprintf(d.Output, "Coordinates: %d in %d instructions with memory %d\n", o, ic.Count(), ic.Len())
 	}
 	if err := ic.Error(); err != nil {
 		_, _ = fmt.Fprintf(d.Output, "Unexpected err %v\n", err)
