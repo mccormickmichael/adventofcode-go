@@ -138,3 +138,25 @@ func TestParseModes(t *testing.T) {
 		}
 	}
 }
+
+func TestOutput(t *testing.T) {
+	program := []int{109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99}
+	expected := []int{109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99}
+	output := []int{}
+	oc := make(chan int, 2)
+	
+	ic := Builder(program).WithOutput(oc).Build()
+	go ic.GoRun()
+
+	for o := range oc {
+		output = append(output, o)
+	}
+
+	if ic.Error() != nil {
+		t.Errorf("Unexpected error %v", ic.Error())
+	}
+
+	if !test.EqualIntSlice(output, expected) {
+		t.Errorf("Program %v yielded %v, expected %v", program, output, expected)
+	}
+}

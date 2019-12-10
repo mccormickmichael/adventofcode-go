@@ -7,10 +7,13 @@ import (
 
 type Intcode struct {
 	mem    []int
+	dump   io.Writer
+
 	input  chan int
 	output chan int
 	halt   chan bool
-	dump   io.Writer
+
+	base   int
 	pc     int
 	count  int
 	halted bool
@@ -63,18 +66,48 @@ func (ic *Intcode) Count() int {
 	return ic.count
 }
 
+func (ic *Intcode) MoveBase(offset int) {
+	ic.base += offset
+}
+
 func (ic *Intcode) Peek(index int) int {
 	return ic.mem[index]
 }
 
 func (ic *Intcode) Mpeek(index int, mode int) int {
 	switch mode {
-	case 1:  return index
-	default: return ic.mem[index]
+	case 0:
+		if ic.hasCapacity(index) {
+			return ic.mem[index]
+		}
+		return 0
+	case 1:
+		return index
+	case 2:
+		if ic.hasCapacity(index + ic.base) {
+			return ic.mem[index + ic.base]
+		}
+		return 0
+	default: ic.error = ModeError{ic, mode}
 	}
+	return 0
+}
+
+func (ic *Intcode) hasCapacity(need int) bool {
+	return len(ic.mem) > need
+}
+
+func (ic *Intcode) resizeTo(cap int) {
+	// TODO: deal with pathologically large capacities
+	newMem := make([]int, cap)
+	copy(newMem, ic.mem)
+	ic.mem = newMem
 }
 
 func (ic *Intcode) Poke(index int, value int) {
+	if !ic.hasCapacity(index) {
+		ic.resizeTo(index+1)
+	}
 	ic.mem[index] = value
 }
 
@@ -88,25 +121,26 @@ func (ic *Intcode) GoRun() {
 func (ic *Intcode) Run() error {
 	if DumpFlag { Dump(ic) }
 	for !ic.halted {
-		if err := ic.Step(); err != nil {
+		ic.Step()
+		if ic.error != nil {
 			ic.halted = true
-			return err
+			return ic.error
 		}
 	}
 	return nil
 }
 
-func (ic *Intcode) Step() error {
+func (ic *Intcode) Step() {
 	op, err := operation(ic.mem, ic.pc)
 	if err != nil {
-		return ic.StepError(err)
+		ic.error = ic.StepError(err)
+		return
 	}
 	ic.pc++
 	adv := op.ex(ic)
 	ic.count++
 	ic.pc += adv
 	if DumpFlag { Dump(ic) }
-	return nil
 }
 
 func (ic *Intcode) StepError(cause error) error {
@@ -114,11 +148,22 @@ func (ic *Intcode) StepError(cause error) error {
 	copy(c, ic.mem)
 	return ErrStep{ic.pc, ic.count, c, cause}
 }
+
 type ErrStep struct {
 	pc, count int
 	mem []int
 	cause error
 }
+
 func (e ErrStep) Error() string {
 	return fmt.Sprintf("Error executing step %d: %s\nDump: PC:%d Heap:%v", e.count, e.cause, e.pc, e.mem)
+}
+
+type ModeError struct {
+	ic   *Intcode
+	mode int
+}
+
+func (e ModeError) Error() string {
+	return fmt.Sprintf("Unknown mode %d at %d on step %d", e.mode, e.ic.pc, e.ic.count)
 }

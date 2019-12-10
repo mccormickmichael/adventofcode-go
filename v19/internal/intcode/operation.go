@@ -32,6 +32,8 @@ func operation(memory []int, ip int) (Operation, error) {
 		op = LtCmpOp{memory[ip+1], memory[ip+2], memory[ip+3], modes}
 	case 8:
 		op = EqCmpOp{memory[ip+1], memory[ip+2], memory[ip+3], modes}
+	case 9:
+		op = RelBase{memory[ip+1], modes}
 	default:
 		return nil, ErrOpcode{opcode}
 	}
@@ -95,22 +97,29 @@ func (a Mul) ex(ic *Intcode) int {
 	return 3
 }
 
-type Ioop struct {
+type OnePOp struct {
 	index int
 	modes Modes
 }
 
-type Input Ioop
+type Input OnePOp
 
 func (i Input) ex(ic *Intcode) int {
 	ic.Poke(i.index, ic.PopInput())
 	return 1
 }
 
-type Output Ioop
+type Output OnePOp
 
 func (o Output) ex(ic *Intcode) int {
 	ic.PushOutput(ic.Mpeek(o.index, o.modes.Mode(0)))
+	return 1
+}
+
+type RelBase OnePOp
+
+func (r RelBase) ex(ic *Intcode) int {
+	ic.MoveBase(ic.Mpeek(r.index, r.modes.Mode(0)))
 	return 1
 }
 
@@ -181,5 +190,5 @@ type ErrOutOfRange struct {
 }
 
 func (e ErrOutOfRange) Error() string {
-	return fmt.Sprintf("Program Counter result of range: pc:%d, limit:%d, needed:%d", e.ic.Pc(), e.ic.Len(), e.need)
+	return fmt.Sprintf("Out of range: pc:%d, limit:%d, needed:%d", e.ic.Pc(), e.ic.Len(), e.need)
 }
