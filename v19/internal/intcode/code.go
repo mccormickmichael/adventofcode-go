@@ -3,7 +3,10 @@ package intcode
 import (
 	"fmt"
 	"io"
+	"log"
 )
+
+const ReallyBig = 1000000
 
 type Intcode struct {
 	mem    []int
@@ -88,7 +91,7 @@ func (ic *Intcode) Mpeek(index int, mode int) int {
 			return ic.mem[index + ic.base]
 		}
 		return 0
-	default: ic.error = ModeError{ic, mode}
+	default: ic.error = ModeError{"peek", ic, mode}
 	}
 	return 0
 }
@@ -98,6 +101,9 @@ func (ic *Intcode) hasCapacity(need int) bool {
 }
 
 func (ic *Intcode) resizeTo(cap int) {
+	if cap > ReallyBig {
+		log.Printf("WARN: capacity is pathologically large: %d", cap)
+	}
 	// TODO: deal with pathologically large capacities
 	newMem := make([]int, cap)
 	copy(newMem, ic.mem)
@@ -109,6 +115,15 @@ func (ic *Intcode) Poke(index int, value int) {
 		ic.resizeTo(index+1)
 	}
 	ic.mem[index] = value
+}
+
+func (ic *Intcode) Mpoke(index int, mode int, value int) {
+	switch mode {
+	case 0: ic.Poke(index, value)
+	case 2: ic.Poke(index + ic.base, value)
+	case 1:
+		ic.error = ModeError{"poke", ic,mode}
+	}
 }
 
 func (ic *Intcode) GoRun() {
@@ -160,10 +175,11 @@ func (e ErrStep) Error() string {
 }
 
 type ModeError struct {
+	op   string
 	ic   *Intcode
 	mode int
 }
 
 func (e ModeError) Error() string {
-	return fmt.Sprintf("Unknown mode %d at %d on step %d", e.mode, e.ic.pc, e.ic.count)
+	return fmt.Sprintf("Unknown mode %d for operation %s at %d on step %d", e.mode, e.op, e.ic.pc, e.ic.count)
 }

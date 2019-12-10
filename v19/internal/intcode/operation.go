@@ -84,7 +84,7 @@ type Add Binop
 func (a Add) ex(ic *Intcode) int {
 	val0 := ic.Mpeek(a.id0, a.modes.Mode(0))
 	val1 := ic.Mpeek(a.id1, a.modes.Mode(1))
-	ic.Poke(a.result, val0+val1)
+	ic.Mpoke(a.result, a.modes.Mode(2), val0+val1)
 	return 3
 }
 
@@ -93,7 +93,7 @@ type Mul Binop
 func (a Mul) ex(ic *Intcode) int {
 	val0 := ic.Mpeek(a.id0, a.modes.Mode(0))
 	val1 := ic.Mpeek(a.id1, a.modes.Mode(1))
-	ic.Poke(a.result, val0*val1)
+	ic.Mpoke(a.result, a.modes.Mode(2), val0*val1)
 	return 3
 }
 
@@ -105,7 +105,7 @@ type OnePOp struct {
 type Input OnePOp
 
 func (i Input) ex(ic *Intcode) int {
-	ic.Poke(i.index, ic.PopInput())
+	ic.Mpoke(i.index, i.modes.Mode(0), ic.PopInput())
 	return 1
 }
 
@@ -164,9 +164,9 @@ func (c LtCmpOp) ex(ic *Intcode) int {
 	val0 := ic.Mpeek(c.p0, c.modes.Mode(0))
 	val1 := ic.Mpeek(c.p1, c.modes.Mode(1))
 	if val0 < val1 {
-		ic.Poke(c.dest, 1)
+		ic.Mpoke(c.dest, c.modes.Mode(2), 1)
 	} else {
-		ic.Poke(c.dest, 0)
+		ic.Mpoke(c.dest, c.modes.Mode(2), 0)
 	}
 	return 3
 }
@@ -177,9 +177,9 @@ func (c EqCmpOp) ex(ic *Intcode) int {
 	val0 := ic.Mpeek(c.p0, c.modes.Mode(0))
 	val1 := ic.Mpeek(c.p1, c.modes.Mode(1))
 	if val0 == val1 {
-		ic.Poke(c.dest, 1)
+		ic.Mpoke(c.dest, c.modes.Mode(2), 1)
 	} else {
-		ic.Poke(c.dest, 0)
+		ic.Mpoke(c.dest, c.modes.Mode(2), 0)
 	}
 	return 3
 }
