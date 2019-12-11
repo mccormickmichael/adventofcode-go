@@ -1,3 +1,4 @@
+package intmath
 
 func Abs(x int) int {
 	if x < 0 {
