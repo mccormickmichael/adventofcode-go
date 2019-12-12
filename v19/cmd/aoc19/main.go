@@ -11,6 +11,7 @@ import (
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day9"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day10"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day11"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/day12"
 	"log"
 	"os"
 	"strconv"
@@ -47,6 +48,7 @@ func main() {
 	case 9: d =  day9.New(path, os.Stdout)
 	case 10: d = day10.New(path, os.Stdout)
 	case 11: d = day11.New(path, os.Stdout)
+	case 12: d = day12.New(path, os.Stdout)
 	default:
 		bail(fmt.Sprintf("Day %d is not implemented.\n", day))
 	}
