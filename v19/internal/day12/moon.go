@@ -9,10 +9,6 @@ type vector struct {
 	x, y, z int
 }
 
-type energetic interface {
-	energy() int
-}
-
 type position vector
 
 func (p position) energy() int {

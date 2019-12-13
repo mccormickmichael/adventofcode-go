@@ -17,4 +17,13 @@ func Cmp(a, b int) int {
 	return 0
 }
 
+func Gcd(a, b int) int {
+	if a == 0 {
+		return b
+	}
+	return Gcd(b % a, a)
+}
 
+func Lcm(a, b int) int {
+	return  a * b / Gcd(a, b)
+}
