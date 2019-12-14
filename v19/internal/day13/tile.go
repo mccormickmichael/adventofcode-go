@@ -40,6 +40,7 @@ type board struct {
 	tiles    [][]int
 	ball     *tile
 	paddle   *tile
+	turn     int
 	score    int
 	gameOver bool
 	renderer io.Writer
@@ -49,6 +50,7 @@ type board struct {
 
 func (b *board) Input() int {
 	if b.paddle != nil && b.ball != nil {
+		b.turn++
 		return intmath.Cmp(b.ball.x, b.paddle.x)
 	}
 	return 0
@@ -73,6 +75,7 @@ func (b *board) Output(val int) {
 func (b *board) Close() {
 	b.gameOver = true
 	b.render()
+	b.renderScore()
 }
 
 func newBoard(x, y int) *board {
@@ -89,7 +92,7 @@ func newBoard(x, y int) *board {
 func (b *board) setTile(t *tile) {
 	if t.x < 0 && t.y == 0 {
 		b.score = t.id
-		// TODO: consider rendering score
+		b.renderScore()
 		return
 	}
 	b.tiles[t.x][t.y] = t.id
@@ -100,7 +103,7 @@ func (b *board) setTile(t *tile) {
 		b.paddle = t
 	}
 }
- 
+
 func (b *board) render() {
 	o := b.renderer
 
@@ -110,6 +113,10 @@ func (b *board) render() {
 		for x := 0; x < b.extent.x; x++ {
 			buf.WriteByte(glyphs[b.tiles[x][y]])
 		}
-		fmt.Fprintln(o, buf.String())
+		_, _ = fmt.Fprintln(o, buf.String())
 	}
+}
+
+func (b *board) renderScore() {
+	_, _ = fmt.Fprintf(b.renderer, "Score: %d\n", b.score)
 }
