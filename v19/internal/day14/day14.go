@@ -15,26 +15,49 @@ func New(path string, output io.Writer) event.Day {
 
 func (d day14) Part1() {
 	r := refinery{}
-	r.init()
+	r.init(1000000000000)
 	for _, rx := range input.Lines(d.Path) {
 		r.makeReaction(rx)
 	}
-	//
-	//for _, c := range r {
-	//	_, _ = fmt.Fprintf(d.Output, "%6s %t\n", c.name, c.producer != nil)
-	//}
 
-	r.refine()
+	amount := 1
+
+	err := r.refine(amount)
+	if err != nil {
+		_, _ = fmt.Fprintf(d.Output, "Out of resources! %v\n", err)
+	}
 	o := r.find("ORE")
-	_, _ = fmt.Fprintf(d.Output, "ORE required for 1 FUEL: %d\n", o.consumed)
+	_, _ = fmt.Fprintf(d.Output, "ORE required for %d FUEL: %d\n", amount, o.consumed)
 
 	for name, c := range r {
-		_, _ = fmt.Fprintf(d.Output, "%8s Produced: %8d, Consumed: %8d, Remain: %8d\n", name, c.produced, c.consumed, c.silo)
+		_, _ = fmt.Fprintf(d.Output, "%7s Produced: %10d, Consumed: %10d, Remain: %10d\n", name, c.produced, c.consumed, c.silo)
 	}
 }
 
 func (d day14) Part2() {
+	r := refinery{}
+	r.init(1000000000000)
+	for _, rx := range input.Lines(d.Path) {
+		r.makeReaction(rx)
+	}
 
+	amount := 3000000
+	count := 0
+	for count < amount {
+		err := r.refine(1)
+		if err != nil {
+			_, _ = fmt.Fprintf(d.Output, "Out of resources! %s\n", err)
+			break
+		}
+		count++
+	}
+
+	o := r.find("ORE")
+	_, _ = fmt.Fprintf(d.Output, "ORE required for %d FUEL: %d\n", count, o.consumed)
+
+	for name, c := range r {
+		_, _ = fmt.Fprintf(d.Output, "%5s Produced: %12d, Consumed: %12d, Remain: %3d\n", name, c.produced, c.consumed, c.silo)
+	}
 }
 
 

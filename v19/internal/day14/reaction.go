@@ -1,5 +1,9 @@
 package day14
 
+import (
+	"fmt"
+)
+
 type component struct {
 	name     string
 	produced int
@@ -30,8 +34,8 @@ func (r refinery) find(name string) *component {
 	return c
 }
 
-func (r refinery) init() {
-	r.find("ORE").silo = 1000000000000
+func (r refinery) init(ore int) {
+	r.find("ORE").silo = ore
 }
 
 func (r *refinery) makeReaction(line string) {
@@ -47,27 +51,43 @@ func (r *refinery) makeReaction(line string) {
 	outputComponent.producer = &reaction
 }
 
-func (r *refinery) refine() {
+func (r *refinery) refine(amount int) error {
 	f := r.find("FUEL")
-	f.take(1)
+	_, err := f.take(amount)
+	return err
 }
 
-func (c *component) take(n int) int {
+type RefineError string
+
+func (e RefineError) Error() string {
+	return string(e)
+}
+
+func (c *component) take(n int) (int, error) {
+
+	if c.silo < n && c.producer == nil {
+		return 0, RefineError(fmt.Sprintf("%s needed %d but only %d available", c.name, n, c.silo))
+	}
 
 	for c.silo < n {
-		made := c.producer.make()
+		made, err := c.producer.make()
+		if err != nil {
+			return 0, err
+		}
 		c.produced += made
 		c.silo += made
 	}
 	c.consumed += n
 	c.silo -= n
-	return n
+	return n, nil
 }
 
-func (r *reaction) make() int {
+func (r *reaction) make() (int, error) {
 	for _, in := range r.inputs {
-		in.c.take(in.n)
+		if _, err := in.c.take(in.n); err != nil {
+			return 0, err
+		}
 	}
-	return r.output
+	return r.output, nil
 }
 
