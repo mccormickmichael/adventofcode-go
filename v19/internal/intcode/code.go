@@ -117,22 +117,19 @@ func (ic *Intcode) Mpoke(index int, mode int, value int) {
 }
 
 func (ic *Intcode) GoRun() {
-	err := ic.Run()
-	ic.error = err
+	ic.Run()
 	ic.halt <- true
-	ic.output.Close()
 }
 
-func (ic *Intcode) Run() error {
+func (ic *Intcode) Run() {
 	if DumpFlag { Dump(ic) }
 	for !ic.halted {
 		ic.Step()
 		if ic.error != nil {
 			ic.halted = true
-			return ic.error
 		}
 	}
-	return nil
+	ic.output.Close()
 }
 
 func (ic *Intcode) Step() {

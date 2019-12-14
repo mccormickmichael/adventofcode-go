@@ -32,9 +32,9 @@ func (d Day2) Part1() {
 	ic.Poke(1, 12)
 	ic.Poke(2, 2)
 
-	err := ic.Run()
-	if err != nil {
-		_, _ = fmt.Fprintf(d.Output, "Unxepected error: %s", err)
+	ic.Run()
+	if ic.Error() != nil {
+		_, _ = fmt.Fprintf(d.Output, "Unxepected error: %s", ic.Error())
 		return
 	}
 	_, _ = fmt.Fprintf(d.Output, "Value: %d in %d instructions", ic.Peek(0), ic.Count())
@@ -48,8 +48,9 @@ func (d Day2) Part2() {
 			ic.Poke(1, noun)
 			ic.Poke(2, verb)
 
-			if err := ic.Run(); err != nil {
-				log.Fatalf("Unexpected error at noun:%d, verb:%d", noun, verb)
+			ic.Run()
+			if ic.Error() != nil {
+				log.Fatalf("Unexpected error at noun:%d, verb:%d %s", noun, verb, ic.Error())
 			}
 			if ic.Peek(0) == 19690720 {
 				_, _ = fmt.Fprintf(d.Output, "noun: %d verb: %d answer %d\n", noun, verb, noun * 100 + verb)
