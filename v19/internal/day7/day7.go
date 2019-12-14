@@ -91,11 +91,15 @@ func Amplify(phase [5]int, program []int) int {
 		intcode.Builder(program).WithInputChannel(cd).WithOutputChannel(de).Build(),
 		intcode.Builder(program).WithInputChannel(de).WithOutputChannel(ea).WithHalt(ehalt).Build(),
 	}
-	for i, ic := range ics {
+	ea <- phase[0]
+	ab <- phase[1]
+	bc <- phase[2]
+	cd <- phase[3]
+	de <- phase[4]
+	for _, ic := range ics {
 		go ic.GoRun()
-		ic.SetInput(phase[i])
 	}
-	ics[0].SetInput(0)
+	ea <- 0
 
 	<- ehalt
 

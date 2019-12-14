@@ -27,10 +27,6 @@ func New(values []int) *Intcode  {
 	return Builder(values).Build()
 }
 
-func (ic *Intcode) SetInput(value int) {
-	ic.input.Set(value)
-}
-
 func (ic *Intcode) PopInput() int {
 	return ic.input.Input()
 }
