@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/day14"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day3"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day4"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day5"
@@ -51,6 +52,7 @@ func main() {
 	case 11: d = day11.New(path, os.Stdout)
 	case 12: d = day12.New(path, os.Stdout)
 	case 13: d = day13.New(path, os.Stdout)
+	case 14: d = day14.New(path, os.Stdout)
 	default:
 		bail(fmt.Sprintf("Day %d is not implemented.\n", day))
 	}

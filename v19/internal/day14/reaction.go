@@ -1,9 +1,5 @@
 package day14
 
-import (
-	"math"
-)
-
 type component struct {
 	name     string
 	produced int
@@ -12,32 +8,48 @@ type component struct {
 	producer *reaction
 }
 
-type input struct {
+type reactionInput struct {
 	c *component
 	n int
 }
 
 type reaction struct {
+	description string
 	output int
-	inputs []input
+	inputs []reactionInput
 }
 
+type refinery map[string]*component
 
-var components = make(map[string]component)
-var reactions = make(map[string]reaction)
+func (r refinery) find(name string) *component {
+	if c, ok := r[name]; ok {
+		return c
+	}
+	c := &component{name:name}
+	r[name] = c
+	return c
+}
 
+func (r refinery) init() {
+	r.find("ORE").silo = 1000000000000
+}
 
-func doit() {
-	components["ORE"] = component{name:"ORE", silo:math.MaxInt64}
+func (r *refinery) makeReaction(line string) {
+	rd := parse(line)
 
-	
-	f := components["FUEL"]
+	inputs := make([]reactionInput, len(rd.inputs))
+	for i, cd := range rd.inputs {
+		component := r.find(cd.name)
+		inputs[i] = reactionInput{c: component, n:cd.count}
+	}
+	reaction := reaction{output:rd.output.count, inputs:inputs, description:line}
+	outputComponent := r.find(rd.output.name)
+	outputComponent.producer = &reaction
+}
 
+func (r *refinery) refine() {
+	f := r.find("FUEL")
 	f.take(1)
-
-	o := components["ORE"]
-
-	println(o.consumed)
 }
 
 func (c *component) take(n int) int {
