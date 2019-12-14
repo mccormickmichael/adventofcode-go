@@ -18,8 +18,7 @@ func (d Day9) Part1() {
 	program := input.ParseInts(input.SingleLineFile(d.Path))
 	oc := make(chan int)
 
-	ic := intcode.Builder(program).WithOutput(oc).Build()
-	ic.SetInput(1)
+	ic := intcode.Builder(program).WithOutputChannel(oc).WithInputValue(1).Build()
 	go ic.GoRun()
 
 	for o := range oc {
@@ -34,8 +33,7 @@ func (d Day9) Part2() {
 	program := input.ParseInts(input.SingleLineFile(d.Path))
 	oc := make(chan int)
 
-	ic := intcode.Builder(program).WithOutput(oc).Build()
-	ic.SetInput(2)
+	ic := intcode.Builder(program).WithOutputChannel(oc).WithInputValue(2).Build()
 	go ic.GoRun()
 
 	for o := range oc {

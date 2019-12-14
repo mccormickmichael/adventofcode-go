@@ -17,8 +17,7 @@ func New(path string, output io.Writer) event.Day {
 func (d Day5) Part1() {
 	program := input.ParseInts(input.SingleLineFile(d.Path))
 	o := make(chan int)
-	ic := intcode.Builder(program).WithOutput(o).Build()
-	ic.SetInput(1)
+	ic := intcode.Builder(program).WithOutputChannel(o).WithInputValue(1).Build()
 
 	var output int
 	go ic.GoRun()
@@ -34,8 +33,7 @@ func (d Day5) Part1() {
 func (d Day5) Part2() {
 	program := input.ParseInts(input.SingleLineFile(d.Path))
 	o := make(chan int)
-	ic := intcode.Builder(program).WithOutput(o).Build()
-	ic.SetInput(5)
+	ic := intcode.Builder(program).WithOutputChannel(o).WithInputValue(5).Build()
 
 	var output int
 	go ic.GoRun()

@@ -85,11 +85,11 @@ func Amplify(phase [5]int, program []int) int {
 	ehalt := make(chan bool)
 
 	ics := []*intcode.Intcode{
-		intcode.Builder(program).WithInput(ea).WithOutput(ab).Build(),
-		intcode.Builder(program).WithInput(ab).WithOutput(bc).Build(),
-		intcode.Builder(program).WithInput(bc).WithOutput(cd).Build(),
-		intcode.Builder(program).WithInput(cd).WithOutput(de).Build(),
-		intcode.Builder(program).WithInput(de).WithOutput(ea).WithHalt(ehalt).Build(),
+		intcode.Builder(program).WithInputChannel(ea).WithOutputChannel(ab).Build(),
+		intcode.Builder(program).WithInputChannel(ab).WithOutputChannel(bc).Build(),
+		intcode.Builder(program).WithInputChannel(bc).WithOutputChannel(cd).Build(),
+		intcode.Builder(program).WithInputChannel(cd).WithOutputChannel(de).Build(),
+		intcode.Builder(program).WithInputChannel(de).WithOutputChannel(ea).WithHalt(ehalt).Build(),
 	}
 	for i, ic := range ics {
 		go ic.GoRun()

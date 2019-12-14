@@ -48,7 +48,7 @@ func paint(program []int, startColor int) panels {
 
 	input := make(chan int, 1)
 	output := make(chan int, 2)
-	ic := intcode.Builder(program).WithInput(input).WithOutput(output).Build()
+	ic := intcode.Builder(program).WithInputChannel(input).WithOutputChannel(output).Build()
 
 	go ic.GoRun()
 

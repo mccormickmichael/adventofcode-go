@@ -5,7 +5,7 @@ import (
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/event"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/input"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/intcode"
-	"github.com/mccormickmichael/adventofcode-go/v19/internal/intmath"
+	//	"github.com/mccormickmichael/adventofcode-go/v19/internal/intmath"
 	"io"
 )
 
@@ -20,7 +20,7 @@ func (d day13) Part1() {
 	program := input.ParseInts(input.SingleLineFile(d.Path))
 	out := make(chan int, 3)
 
-	ic := intcode.Builder(program).WithOutput(out).Build()
+	ic := intcode.Builder(program).WithOutputChannel(out).Build()
 
 	go ic.GoRun()
 
@@ -43,6 +43,31 @@ func (d day13) Part1() {
 // expected extents: x: 38 y: 20
 
 func (d day13) Part2() {
+	// program := input.ParseInts(input.SingleLineFile(d.Path))
+	// out := make(chan int, 3)
+	// in  := make(chan int)
+
+	// ic := intcode.Builder(program).WithOutput(out).WithInput(in).Build()
+	// ic.Poke(0, 2)
+	
+	// go ic.GoRun()
+
+	// b := newBoard(38, 20)
+
+	// b.read(out)
+	// b.render(d.Output)
+	// _, _ = fmt.Fprintf(d.Output, "Score: %d\n", b.score)
+
+	// in <- intmath.Cmp(b.ball.x, b.paddle.x)
+
+	// for x := 0; x < b.extent.x; x++ {
+	// 	for y := 0; y < b.extent.y; y++ {
+	// 		_, _ = fmt.Fprintf(d.Output, "%v ", readTile(out))
+	// 	}
+	// }
+	// 	b.read(out)
+	// b.render(d.Output)
+	// _, _ = fmt.Fprintf(d.Output, "Score: %d\n", b.score)
 
 }
 

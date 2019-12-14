@@ -12,8 +12,8 @@ type Intcode struct {
 	mem    []int
 	dump   io.Writer
 
-	input  chan int
-	output chan int
+	input  Inputter
+	output Outputter
 	halt   chan bool
 
 	base   int
@@ -27,22 +27,16 @@ func New(values []int) *Intcode  {
 	return Builder(values).Build()
 }
 
-func (ic *Intcode) SetInput(input ...int) {
-	for _, i := range input {
-		ic.input <- i
-	}
+func (ic *Intcode) SetInput(value int) {
+	ic.input.Set(value)
 }
 
 func (ic *Intcode) PopInput() int {
-	return <- ic.input
+	return ic.input.Input()
 }
 
 func (ic *Intcode) PushOutput(value int) {
-	ic.output <- value
-}
-
-func (ic *Intcode) PopOutput() int {
-	return <- ic.output
+	ic.output.Output(value)
 }
 
 func (ic *Intcode) Halt() {
@@ -130,7 +124,7 @@ func (ic *Intcode) GoRun() {
 	err := ic.Run()
 	ic.error = err
 	ic.halt <- true
-	close(ic.output)
+	ic.output.Close()
 }
 
 func (ic *Intcode) Run() error {
