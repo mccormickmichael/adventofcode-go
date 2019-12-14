@@ -18,16 +18,15 @@ func New(path string, output io.Writer) event.Day {
 
 func (d day13) Part1() {
 	program := input.ParseInts(input.SingleLineFile(d.Path))
-	out := make(chan int, 3)
 
-	ic := intcode.Builder(program).WithOutputChannel(out).Build()
+	b := newBoard(38, 20)
+	b.renderer = d.Output // ick.
 
-	go ic.GoRun()
+	ic := intcode.Builder(program).WithOutputter(b).Build()
 
 	blocks := 0
-	b := newBoard(38, 20)
+	ic.Run()
 
-	b.read(out)
 	for x := 0; x < b.extent.x; x++ {
 		for y := 0; y < b.extent.y; y++ {
 			if b.tiles[x][y] == Block {
@@ -36,7 +35,6 @@ func (d day13) Part1() {
 		}
 	}
 
-	b.render(d.Output)
 	_, _ = fmt.Fprintf(d.Output, "Blocks: %d\n", blocks)
 }
 
@@ -71,17 +69,3 @@ func (d day13) Part2() {
 
 }
 
-func readTile(in chan int) *tile {
-
-	buf := [3]int{}
-	count := 0
-	for count < 3 {
-		select {
-		case buf[count] = <- in:
-			count ++
-		default:
-			return nil
-		}
-	}
-	return &tile{coord{buf[0], buf[1]}, buf[2]}
-}

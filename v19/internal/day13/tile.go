@@ -2,6 +2,7 @@ package day13
 
 import (
 	"fmt"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/intmath"
 	"io"
 	"strings"
 )
@@ -35,13 +36,44 @@ type tile struct {
 
 
 type board struct {
-	extent coord
-	tiles [][]int
-	ball *tile
-	paddle *tile
-	score int
+	extent   coord
+	tiles    [][]int
+	ball     *tile
+	paddle   *tile
+	score    int
+	gameOver bool
+	renderer io.Writer
+	buf      [2]int
+	bufsize  int
 }
 
+func (b *board) Input() int {
+	if b.paddle != nil && b.ball != nil {
+		return intmath.Cmp(b.ball.x, b.paddle.x)
+	}
+	return 0
+}
+
+func (b *board) Output(val int) {
+
+	switch b.bufsize {
+	case 0:
+		b.buf[0] = val
+		b.bufsize = 1
+	case 1:
+		b.buf[1] = val
+		b.bufsize = 2
+	case 2:
+		t := tile{coord{b.buf[0], b.buf[1]}, val}
+		b.bufsize = 0
+		b.setTile(&t)
+	}
+}
+
+func (b *board) Close() {
+	b.gameOver = true
+	b.render()
+}
 
 func newBoard(x, y int) *board {
 	cols := make([][]int, x)
@@ -53,8 +85,24 @@ func newBoard(x, y int) *board {
 		tiles:  cols,
 	}
 }
+
+func (b *board) setTile(t *tile) {
+	if t.x < 0 && t.y == 0 {
+		b.score = t.id
+		// TODO: consider rendering score
+		return
+	}
+	b.tiles[t.x][t.y] = t.id
+	if t.id == Ball {
+		b.ball = t
+	}
+	if t.id == Paddle {
+		b.paddle = t
+	}
+}
  
-func (b *board) render(o io.Writer) {
+func (b *board) render() {
+	o := b.renderer
 
 	for y := 0; y < b.extent.y; y++ {
 		buf := strings.Builder{}
@@ -63,21 +111,5 @@ func (b *board) render(o io.Writer) {
 			buf.WriteByte(glyphs[b.tiles[x][y]])
 		}
 		fmt.Fprintln(o, buf.String())
-	}
-}
-
-func (b *board) read(in chan int) {
-	for t := readTile(in); t != nil; t = readTile(in) {
-		if t.x < 0 && t.y == 0 {
-			b.score = t.id
-			continue
-		}
-		b.tiles[t.x][t.y] = t.id
-		if t.id == Ball {
-			b.ball = t
-		}
-		if t.id == Paddle {
-			b.paddle = t
-		}
 	}
 }
