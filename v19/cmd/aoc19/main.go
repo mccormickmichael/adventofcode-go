@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/mccormickmichael/adventofcode-go/v19/internal/day14"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/day1"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/day2"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day3"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day4"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day5"
@@ -14,13 +15,12 @@ import (
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day11"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day12"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day13"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/day14"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/day15"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/event"
 	"log"
 	"os"
 	"strconv"
-
-	"github.com/mccormickmichael/adventofcode-go/v19/internal/event"
-	"github.com/mccormickmichael/adventofcode-go/v19/internal/day1"
-	"github.com/mccormickmichael/adventofcode-go/v19/internal/day2"
 )
 
 func main() {
@@ -53,6 +53,7 @@ func main() {
 	case 12: d = day12.New(path, os.Stdout)
 	case 13: d = day13.New(path, os.Stdout)
 	case 14: d = day14.New(path, os.Stdout)
+	case 15: d = day15.New(path, os.Stdout)
 	default:
 		bail(fmt.Sprintf("Day %d is not implemented.\n", day))
 	}
