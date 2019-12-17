@@ -7,6 +7,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type day16 event.Solvable
@@ -18,15 +19,23 @@ func New(path string, output io.Writer) event.Day {
 func (d day16) Part1() {
 	digits := input.Digits(strings.TrimSpace(input.SingleLineFile(d.Path)))
 
+	msg := make([]int, len(digits)+1)
+	copy(msg[1:], digits)
+	start := time.Now()
+
 	for i := 0; i < 100; i++ {
-		digits = nextPhase(digits)
+		fft(msg)
+		//		digits = nextPhase(digits)
 	}
 
+	elapsed := time.Now().Sub(start)
+
 	b := strings.Builder{}
-	for i := 0; i < 8; i++ {
-		b.WriteString(strconv.Itoa(digits[i]))
+	for i := 1; i < 9; i++ {
+		b.WriteString(strconv.Itoa(msg[i]))
 	}
 	_, _ = fmt.Fprintf(d.Output, "input length: %d\n", len(digits))
+	_, _ = fmt.Fprintf(d.Output, "elapsed time: %f\n", float64(elapsed/1000)/1000.0)
 	_, _ = fmt.Fprintf(d.Output, "%s\n", b.String())
 	
 }
@@ -41,4 +50,4 @@ func (d day16) Part2() {
 	// skip the zeroes.
 }
 
-6500000
+// 6500000
