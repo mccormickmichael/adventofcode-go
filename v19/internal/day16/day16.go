@@ -55,17 +55,16 @@ func (d day16) Part2() {
 	start = time.Now()
 	
 	for i := 0; i < 100; i++ {
-		fft(msg)
-		_, _ = fmt.Fprintf(d.Output, "phase %d\n", i+1)
+		fft2(msg[offset:])
 	}
 
 	elapsed = time.Now().Sub(start)
 
-	_, _ = fmt.Fprintf(d.Output, "computed phases in %f ms\n", float64(elapsed/1000)/1000.0)
+	_, _ = fmt.Fprintf(d.Output, "computed phases in %.3f ms\n", float64(elapsed/1000)/1000.0)
 
 	output := makeOutput(msg[offset+1:])
 
-	_, _ = fmt.Fprintf(d.Output, "message at offset %d is %s", offset, output)
+	_, _ = fmt.Fprintf(d.Output, "message at offset %d is %s\n", offset, output)
 }
 
 func makeOutput(digits []int) string {
