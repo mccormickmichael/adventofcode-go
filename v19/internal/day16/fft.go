@@ -2,10 +2,6 @@ package day16
 
 import (
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/intmath"
-	// "fmt"
-	// "io"
-	// "strconv"
-	// "strings"
 )
 
 func fft(msg []int) {

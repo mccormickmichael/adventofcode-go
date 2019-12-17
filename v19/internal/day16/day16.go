@@ -25,7 +25,6 @@ func (d day16) Part1() {
 
 	for i := 0; i < 100; i++ {
 		fft(msg)
-		//		digits = nextPhase(digits)
 	}
 
 	elapsed := time.Now().Sub(start)
@@ -41,6 +40,28 @@ func (d day16) Part1() {
 }
 
 func (d day16) Part2() {
+
+	digits := input.Digits(strings.TrimSpace(input.SingleLineFile(d.Path)))
+
+	start := time.Now()
+	msg := make([]int, len(digits)*10000 + 1)
+	for i := 0; i < 10000; i++ {
+		copy(msg[i*len(digits)+1:], digits)
+	}
+	elapsed := time.Now().Sub(start)
+
+	_, _ = fmt.Fprintf(d.Output, "created the message in %f ms\n", float64(elapsed/1000)/1000.0)
+
+	start = time.Now()
+	
+	for i := 0; i < 100; i++ {
+		fft(msg)
+		_, _ = fmt.Fprintf(d.Output, "phase %d\n", i+1)
+	}
+
+	elapsed = time.Now().Sub(start)
+
+	_, _ = fmt.Fprintf(d.Output, "computed phases in %f ms\n", float64(elapsed/1000)/1000.0)
 
 	// notes on part 2: I can calculate the next phase in-place
 	// because the first N terms are 0 for the N'th value
