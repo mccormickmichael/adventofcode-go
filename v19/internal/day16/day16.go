@@ -29,19 +29,19 @@ func (d day16) Part1() {
 
 	elapsed := time.Now().Sub(start)
 
-	b := strings.Builder{}
-	for i := 1; i < 9; i++ {
-		b.WriteString(strconv.Itoa(msg[i]))
-	}
+	output := makeOutput(msg[1:])
+
 	_, _ = fmt.Fprintf(d.Output, "input length: %d\n", len(digits))
 	_, _ = fmt.Fprintf(d.Output, "elapsed time: %f\n", float64(elapsed/1000)/1000.0)
-	_, _ = fmt.Fprintf(d.Output, "%s\n", b.String())
+	_, _ = fmt.Fprintf(d.Output, "%s\n", output)
 	
 }
 
 func (d day16) Part2() {
 
-	digits := input.Digits(strings.TrimSpace(input.SingleLineFile(d.Path)))
+	line := input.SingleLineFile(d.Path)
+	offset, _ := strconv.Atoi(line[:7])
+	digits := input.Digits(strings.TrimSpace(line))
 
 	start := time.Now()
 	msg := make([]int, len(digits)*10000 + 1)
@@ -63,12 +63,18 @@ func (d day16) Part2() {
 
 	_, _ = fmt.Fprintf(d.Output, "computed phases in %f ms\n", float64(elapsed/1000)/1000.0)
 
-	// notes on part 2: I can calculate the next phase in-place
-	// because the first N terms are 0 for the N'th value
+	output := makeOutput(msg[offset+1:])
 
-	// prepend '0' to the list of digits and you don't have to offset the series
-	// add and subtract subsets of sequences. Multiplication not necessary
-	// skip the zeroes.
+	_, _ = fmt.Fprintf(d.Output, "message at offset %d is %s", offset, output)
 }
+
+func makeOutput(digits []int) string {
+	b := strings.Builder{}
+	for i := 0; i < 8; i++ {
+		b.WriteString(strconv.Itoa(digits[i]))
+	}
+	return b.String()
+}
+
 
 // 6500000
