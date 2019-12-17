@@ -7,6 +7,20 @@ func Abs(x int) int {
 	return x
 }
 
+func Max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func Min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 func Cmp(a, b int) int {
 	if a < b {
 		return -1
