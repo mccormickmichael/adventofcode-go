@@ -31,6 +31,14 @@ func ParseInts(s string) []int {
 	return values
 }
 
+func Digits(s string) []int {
+	digits := make([]int, len(s))
+	for i := 0; i < len(s); i++ {
+		digits[i] = int(s[i]-48) // this makes me slightly uncomfortable.
+	}
+	return digits
+}
+
 func Lines(path string) []string {
 	file, err := os.Open(path)
 	if err != nil {

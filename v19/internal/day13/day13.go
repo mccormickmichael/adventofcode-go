@@ -5,7 +5,6 @@ import (
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/event"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/input"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/intcode"
-	//	"github.com/mccormickmichael/adventofcode-go/v19/internal/intmath"
 	"io"
 )
 
