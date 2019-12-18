@@ -48,3 +48,13 @@ type ValueInput struct {
 func (v *ValueInput) Input() int {
 	return v.value
 }
+
+type SliceInput struct {
+	In []int
+}
+
+func (s *SliceInput) Input() int {
+	v := s.In[0]
+	s.In = s.In[1:]
+	return v
+}

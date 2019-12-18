@@ -18,6 +18,7 @@ import (
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day14"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day15"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day16"
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/day17"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/event"
 	"log"
 	"os"
@@ -40,15 +41,15 @@ func main() {
 	d := event.NilDay()
 
 	switch day {
-	case 1: d =  day1.New(path, os.Stdout)
-	case 2: d =  day2.New(path, os.Stdout)
-	case 3: d =  day3.New(path, os.Stdout)
-	case 4: d =  day4.New(152085, 670283, os.Stdout)
-	case 5: d =  day5.New(path, os.Stdout)
-	case 6: d =  day6.New(path, os.Stdout)
-	case 7: d =  day7.New(path, os.Stdout)
-	case 8: d =  day8.New(path, os.Stdout)
-	case 9: d =  day9.New(path, os.Stdout)
+	case 1:  d =  day1.New(path, os.Stdout)
+	case 2:  d =  day2.New(path, os.Stdout)
+	case 3:  d =  day3.New(path, os.Stdout)
+	case 4:  d =  day4.New(152085, 670283, os.Stdout)
+	case 5:  d =  day5.New(path, os.Stdout)
+	case 6:  d =  day6.New(path, os.Stdout)
+	case 7:  d =  day7.New(path, os.Stdout)
+	case 8:  d =  day8.New(path, os.Stdout)
+	case 9:  d =  day9.New(path, os.Stdout)
 	case 10: d = day10.New(path, os.Stdout)
 	case 11: d = day11.New(path, os.Stdout)
 	case 12: d = day12.New(path, os.Stdout)
@@ -56,6 +57,7 @@ func main() {
 	case 14: d = day14.New(path, os.Stdout)
 	case 15: d = day15.New(path, os.Stdout)
 	case 16: d = day16.New(path, os.Stdout)
+	case 17: d = day17.New(path, os.Stdout)
 	default:
 		bail(fmt.Sprintf("Day %d is not implemented.\n", day))
 	}
