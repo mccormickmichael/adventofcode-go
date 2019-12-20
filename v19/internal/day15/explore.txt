@@ -1,0 +1,38 @@
+How to explore the maze with the robot:
+
+type robot struct {
+  x, y int
+  direction int
+  node *node
+}
+
+struct node {
+  x, y int
+  traversable bool
+  explored    bool
+  neighbors   [4]*node
+  distance    int
+}
+
+const (
+ North = 0
+ East  = 1
+ South = 2
+ West  = 3
+)
+
+Maintain an array of 'nodes to explore' We are done exploring when this array is empty.
+
+Start the robot at 0, 0, facing North.
+
+Move the robot in its current direction
+If the robot moves, update the current node's neighbor and the new node's neighbor appropriately. The new node's distance is the current node's distance + 1.
+Add the new node to the list of nodes to explore.
+
+If the node is the oxygen system note the location and distance from the origin.
+
+If the robot hits a wall, update the appropriate neighbor with a non-traversable node. Turn right (i.e. cycle through directions mod4) until you find a nil neighbor. Attempt to move in that direction.
+
+If there are no more nil neighbors, set the fully explored flag and pop the current node off the list of nodes to explore. Identify the direction of the next node in the list and move towards it. Turn right to the next nil neighbor and repeat.
+
+This should fully explore every node in the maze
