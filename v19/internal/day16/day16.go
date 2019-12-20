@@ -54,8 +54,7 @@ func (d day16) Part2() {
 
 	start = time.Now()
 	
-	for i := 0; i < 100; i++ {
-		fft2(msg[offset:])
+	for i := 0; i < 100; i++ {		fft2(msg[offset:])
 	}
 
 	elapsed = time.Now().Sub(start)

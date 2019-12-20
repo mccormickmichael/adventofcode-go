@@ -1,47 +1,78 @@
 package day15
 
-import "github.com/mccormickmichael/adventofcode-go/v19/internal/maze"
+import (
+	"github.com/mccormickmichael/adventofcode-go/v19/internal/maze"
+	"log"
+)
 
-type prober interface {
+type Prober interface {
 	probe(location maze.Coord, direction maze.Dir) *maze.Cell
+}
+
+type directionFinder interface {
+	nextDirection() maze.Dir
 }
 
 
 type exploration struct {
-	cell    *maze.Cell
-	lastDir maze.Dir
+	cell *maze.Cell
+	dir  maze.Dir
 }
 
-func (e exploration) nextNilNeighbor() exploration {
+func (e exploration) nextDirection() maze.Dir {
 	neighbors := e.cell.Neighbors()
-	dir := e.lastDir
+	nextDir := e.dir
 	for t := 0; t < 4; t++ {
-		dir = dir.Next()
-		c := neighbors[int(dir)]
-		if c == nil {
-			return exploration{c, dir}
+		nextDir = nextDir.Next()
+		if neighbors[int(nextDir)] == nil {
+			return nextDir
 		}
 	}
-	return exploration{nil, maze.Up}
+	return maze.None
 }
 
-type mapper struct {
+type Mapper struct {
 	maze     *maze.Maze
 	explores []exploration
-	probe    prober
+	probe    Prober
 }
 
-func (m *mapper) Step() {
+func NewMapper(maze *maze.Maze, probe Prober) *Mapper{
+	return &Mapper{maze:maze, probe:probe}
+}
 
-	e := m.explores[len(m.explores)-1]
-	nextCell := m.probe.probe(e.cell.Loc(), e.lastDir)
-
-	if !nextCell.Traversable {
-		exp := e.nextNilNeighbor()
-		if exp.cell == nil {
-			m.explores = m.explores[:len(m.explores)-1]
-		} else {
-			m.explores = append(m.explores, exp)
-		}
+func (m *Mapper) Start(start maze.Coord) {
+	startCell := maze.NewCell("O", m.maze, start, true)
+	err := m.maze.Set(start.X, start.Y, startCell)
+	if err != nil {
+		log.Printf("Error setting cell %v: %s", startCell, err)
 	}
+	m.explores = []exploration{{startCell, maze.Up}}
+}
+
+func (m *Mapper) Map() {
+
+	for len(m.explores) > 0 {
+		m.Step()
+	}
+}
+
+func (m *Mapper) Step() {
+	lastIndex := len(m.explores)-1
+	e := m.explores[lastIndex]
+
+	nextCell := m.probe.probe(e.cell.Loc(), e.dir)
+
+	if !nextCell.Traversable || nextCell.Explored {
+		nextDir := e.nextDirection()
+		if nextDir == maze.None {
+			m.explores[lastIndex].cell.Explored = true
+			m.explores[lastIndex].cell = nil
+			m.explores = m.explores[:lastIndex]
+			return
+		}
+		m.explores[lastIndex].dir = nextDir
+		return
+	}
+	m.explores = append(m.explores, exploration{nextCell, e.dir})
 }

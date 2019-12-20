@@ -4,11 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/intmath"
+	"io"
+	"strings"
 )
 
 type Dir int
 
 const (
+	None  Dir = -1
 	Up    Dir = 0
 	Right Dir = 1
 	Down  Dir = 2
@@ -16,7 +19,17 @@ const (
 )
 
 func (d Dir) Next() Dir {
+	if d == None {
+		return None
+	}
 	return (d + 1) % 4
+}
+
+func (d Dir) Reverse() Dir {
+	if d == None {
+		return None
+	}
+	return (d + 2) % 4
 }
 
 type Coord struct {
@@ -32,7 +45,11 @@ func (c Coord) Distance(o Coord) int {
 	return intmath.Abs(o.X - c.X) + intmath.Abs(o.Y - c.Y)
 }
 
-func New(top, left, bottom, right int) *Maze {
+type Celler interface {
+	At(x, y int) *Cell
+}
+
+func NewMaze(top, left, bottom, right int) *Maze {
 	xExtent := right-left
 	yExtent := bottom-top
 	maze := &Maze{xOffset:left, yOffset:top, xExtent:xExtent, yExtent:yExtent}
@@ -50,7 +67,7 @@ type Maze struct {
 }
 
 func (m *Maze) At(x, y int) *Cell {
-	if x < 0 || x > m.xExtent || y < 0 || y > m.yExtent {
+	if x < m.xOffset || x > m.xExtent || y < m.yOffset || y > m.yExtent {
 		return nil
 	}
 	xo := x - m.xOffset
@@ -59,7 +76,7 @@ func (m *Maze) At(x, y int) *Cell {
 }
 
 func (m *Maze) Set(x, y int, c *Cell) error {
-	if x < 0 || x > m.xExtent || y < 0 || y > m.yExtent {
+	if x < m.xOffset || x > m.xExtent || y < m.yOffset || y > m.yExtent {
 		return errors.New(fmt.Sprintf("[%d, %d] not in maze extent [%d, %d, %d, %d]",
 			x, y, m.xOffset, m.yOffset, m.xExtent-m.xOffset, m.yExtent-m.yOffset))
 	}
@@ -68,4 +85,16 @@ func (m *Maze) Set(x, y int, c *Cell) error {
 	m.cells[xo][yo] = c
 
 	return nil
+}
+
+func (m *Maze) Render(o io.Writer) {
+	_, _ = fmt.Fprintf(o, "top: %d left %d\n", m.xOffset, m.yOffset)
+
+	for y := 0; y < m.yExtent; y++ {
+		b := strings.Builder{}
+		for x := 0; x < m.xExtent; x++ {
+			b.WriteString(m.cells[x][y].String())
+		}
+		_, _ = fmt.Fprintln(o, b.String())
+	}
 }
