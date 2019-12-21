@@ -6,15 +6,30 @@ import (
 )
 
 type mapper struct {
-	entrance maze.Coord
-	doors    map[string]Door
-	keys     map[string]Key
+	entrance   maze.Coord
+	foundDoors map[string]Door
+	foundKeys  map[string]Key
 }
 
 func newMapper() mapper {
-	return mapper{doors: make(map[string]Door), keys: make(map[string]Key)}
+	return mapper{foundDoors: make(map[string]Door), foundKeys: make(map[string]Key)}
 }
 
+func (m *mapper) keys() []Key {
+	keys := make([]Key, 0, len(m.foundKeys))
+	for _, k := range m.foundKeys {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+func (m *mapper) doors() []Door {
+	doors := make([]Door, 0, len(m.foundDoors))
+	for _, k := range m.foundDoors {
+		doors = append(doors, k)
+	}
+	return doors
+}
 
 func (m *mapper) build(layout []string) *maze.Maze {
 
@@ -43,11 +58,11 @@ func (m *mapper) parseCell(mz *maze.Maze, loc maze.Coord, b byte) (*maze.Cell, e
 		return maze.NewCell(".", mz, loc, true), nil
 	case b >= 65 && b <= 90:
 		name := string(b)
-		m.doors[name] = makeDoor(name, loc)
+		m.foundDoors[name] = makeDoor(name, loc)
 		return maze.NewCell(string(b), mz, loc, false), nil
 	case b >= 97 && b <= 122:
 		name := string(b)
-		m.keys[name] = makeKey(name, loc)
+		m.foundKeys[name] = makeKey(name, loc)
 		return maze.NewCell(name, mz, loc, true), nil
 	default:
 		return nil, fmt.Errorf("unknown cell type %b", b)
