@@ -37,6 +37,9 @@ type Mapper struct {
 	maze     *maze.Maze
 	explores []*exploration
 	probe    Prober
+	steps    int
+	maxDepth int
+	oxygenDistance int
 }
 
 func NewMapper(maze *maze.Maze, probe Prober) *Mapper{
@@ -53,12 +56,11 @@ func (m *Mapper) Start(start maze.Coord) {
 }
 
 func (m *Mapper) Map() error {
-	steps := 0
 	for len(m.explores) > 0 {
 		if err := m.Step(); err != nil {
-			return fmt.Errorf("step %d: %s", steps, err)
+			return fmt.Errorf("step %d: %s", m.steps, err)
 		}
-		steps++
+		m.steps++
 	}
 	return nil
 }
@@ -77,6 +79,9 @@ func (m *Mapper) Step() error {
 	if err != nil {
 		return err
 	}
+	if nextCell.Id() == "O" {
+		m.oxygenDistance = len(m.explores)
+	}
 
 	if !nextCell.Traversable || nextCell.Explored {
 		e.dir = e.nextDirection()
@@ -84,6 +89,9 @@ func (m *Mapper) Step() error {
 	}
 	m.explores = append(m.explores, &exploration{nextCell, e.dir, e.dir.Reverse()})
 	e.dir = e.nextDirection()
+	if len(m.explores) > m.maxDepth {
+		m.maxDepth = len(m.explores)
+	}
 	return nil
 }
 
