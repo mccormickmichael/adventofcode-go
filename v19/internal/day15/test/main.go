@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/day15"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/maze"
 	"os"
@@ -14,7 +15,9 @@ func main() {
 	mapper := day15.NewMapper(testMaze, tiny)
 
 	mapper.Start(tiny.Start)
-	mapper.Map()
+	if err := mapper.Map(); err != nil {
+		_, _ = fmt.Fprint(os.Stdout, err)
+	}
 
 	testMaze.Render(os.Stdout)
 }

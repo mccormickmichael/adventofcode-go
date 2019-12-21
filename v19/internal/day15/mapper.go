@@ -1,12 +1,13 @@
 package day15
 
 import (
+	"fmt"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/maze"
 	"log"
 )
 
 type Prober interface {
-	probe(location maze.Coord, direction maze.Dir) *maze.Cell
+	probe(location maze.Coord, direction maze.Dir) (*maze.Cell, error)
 }
 
 type directionFinder interface {
@@ -15,11 +16,12 @@ type directionFinder interface {
 
 
 type exploration struct {
-	cell *maze.Cell
-	dir  maze.Dir
+	cell    *maze.Cell
+	dir     maze.Dir
+	reverse maze.Dir
 }
 
-func (e exploration) nextDirection() maze.Dir {
+func (e *exploration) nextDirection() maze.Dir {
 	neighbors := e.cell.Neighbors()
 	nextDir := e.dir
 	for t := 0; t < 4; t++ {
@@ -33,7 +35,7 @@ func (e exploration) nextDirection() maze.Dir {
 
 type Mapper struct {
 	maze     *maze.Maze
-	explores []exploration
+	explores []*exploration
 	probe    Prober
 }
 
@@ -42,37 +44,60 @@ func NewMapper(maze *maze.Maze, probe Prober) *Mapper{
 }
 
 func (m *Mapper) Start(start maze.Coord) {
-	startCell := maze.NewCell("O", m.maze, start, true)
+	startCell := maze.NewCell("S", m.maze, start, true)
 	err := m.maze.Set(start.X, start.Y, startCell)
 	if err != nil {
 		log.Printf("Error setting cell %v: %s", startCell, err)
 	}
-	m.explores = []exploration{{startCell, maze.Up}}
+	m.explores = []*exploration{{startCell, maze.Up, maze.None}}
 }
 
-func (m *Mapper) Map() {
-
+func (m *Mapper) Map() error {
+	steps := 0
 	for len(m.explores) > 0 {
-		m.Step()
+		if err := m.Step(); err != nil {
+			return fmt.Errorf("step %d: %s", steps, err)
+		}
+		steps++
 	}
+	return nil
 }
 
-func (m *Mapper) Step() {
+func (m *Mapper) Step() error {
 	lastIndex := len(m.explores)-1
 	e := m.explores[lastIndex]
 
-	nextCell := m.probe.probe(e.cell.Loc(), e.dir)
+	if e.dir == maze.None {
+		e.cell.Explored = true
+		m.explores = m.explores[:lastIndex]
+		return m.reverse(e.cell.Loc(), e.reverse)
+	}
+
+	nextCell, err := m.probe.probe(e.cell.Loc(), e.dir)
+	if err != nil {
+		return err
+	}
 
 	if !nextCell.Traversable || nextCell.Explored {
-		nextDir := e.nextDirection()
-		if nextDir == maze.None {
-			m.explores[lastIndex].cell.Explored = true
-			m.explores[lastIndex].cell = nil
-			m.explores = m.explores[:lastIndex]
-			return
-		}
-		m.explores[lastIndex].dir = nextDir
-		return
+		e.dir = e.nextDirection()
+		return nil
 	}
-	m.explores = append(m.explores, exploration{nextCell, e.dir})
+	m.explores = append(m.explores, &exploration{nextCell, e.dir, e.dir.Reverse()})
+	e.dir = e.nextDirection()
+	return nil
+}
+
+func (m *Mapper) reverse(loc maze.Coord, reverseDir maze.Dir) error {
+	if len(m.explores) == 0 {
+		return nil
+	}
+	last := m.explores[len(m.explores)-1]
+	result, err := m.probe.probe(loc, reverseDir)
+	if err != nil {
+		return fmt.Errorf("reversing %v, %s: %s", loc, reverseDir, err)
+	}
+	if result.Loc() != last.cell.Loc() {
+		return fmt.Errorf("expected reverse to %v but was %v", last.cell.Loc(), result.Loc())
+	}
+	return nil
 }

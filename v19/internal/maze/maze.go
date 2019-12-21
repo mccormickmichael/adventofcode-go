@@ -32,6 +32,17 @@ func (d Dir) Reverse() Dir {
 	return (d + 2) % 4
 }
 
+func (d Dir) String() string {
+	switch d {
+	case None: return "None"
+	case Up:   return "Up"
+	case Right: return "Right"
+	case Down: return "Down"
+	case Left: return "Left"
+	}
+	return fmt.Sprintf("%d", d)
+}
+
 type Coord struct {
 	X, Y int
 }
@@ -67,21 +78,21 @@ type Maze struct {
 }
 
 func (m *Maze) At(x, y int) *Cell {
-	if x < m.xOffset || x > m.xExtent || y < m.yOffset || y > m.yExtent {
-		return nil
-	}
 	xo := x - m.xOffset
 	yo := y - m.yOffset
+	if xo < 0 || xo > m.xExtent || yo < 0 || yo > m.yExtent {
+		return nil
+	}
 	return m.cells[xo][yo]
 }
 
 func (m *Maze) Set(x, y int, c *Cell) error {
-	if x < m.xOffset || x > m.xExtent || y < m.yOffset || y > m.yExtent {
+	xo := x - m.xOffset
+	yo := y - m.yOffset
+	if xo < 0 || xo > m.xExtent || yo < 0 || yo > m.yExtent {
 		return errors.New(fmt.Sprintf("[%d, %d] not in maze extent [%d, %d, %d, %d]",
 			x, y, m.xOffset, m.yOffset, m.xExtent-m.xOffset, m.yExtent-m.yOffset))
 	}
-	xo := x - m.xOffset
-	yo := y - m.yOffset
 	m.cells[xo][yo] = c
 
 	return nil

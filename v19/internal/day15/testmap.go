@@ -1,8 +1,8 @@
 package day15
 
 import (
+	"fmt"
 	"github.com/mccormickmichael/adventofcode-go/v19/internal/maze"
-	"log"
 )
 
 func Tiny(m *maze.Maze) *TestMap {
@@ -38,7 +38,7 @@ func NewTestMap(m *maze.Maze, layout []string, start maze.Coord) *TestMap {
 	return &TestMap{m,cells, start}
 }
 
-func (m *TestMap) probe(loc maze.Coord, dir maze.Dir) *maze.Cell {
+func (m *TestMap) probe(loc maze.Coord, dir maze.Dir) (*maze.Cell, error) {
 	switch dir {
 	case maze.Up: loc.Y-=1
 	case maze.Down: loc.Y +=1
@@ -48,7 +48,7 @@ func (m *TestMap) probe(loc maze.Coord, dir maze.Dir) *maze.Cell {
 	c := m.cells[loc.X][loc.Y]
 	err := m.maze.Set(loc.X, loc.Y, c)
 	if err != nil {
-		log.Printf("Error setting cell %v: %s", c, err)
+		return nil, fmt.Errorf("error setting cell %v: %s", c, err)
 	}
-	return c
+	return c, nil
 }
