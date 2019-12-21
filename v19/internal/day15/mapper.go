@@ -48,7 +48,7 @@ func NewMapper(maze *maze.Maze, probe Prober) *Mapper{
 
 func (m *Mapper) Start(start maze.Coord) {
 	startCell := maze.NewCell("S", m.maze, start, true)
-	err := m.maze.Set(start.X, start.Y, startCell)
+	err := m.maze.Set(start, startCell)
 	if err != nil {
 		log.Printf("Error setting cell %v: %s", startCell, err)
 	}
@@ -79,7 +79,7 @@ func (m *Mapper) Step() error {
 	if err != nil {
 		return err
 	}
-	if nextCell.Id() == "O" {
+	if nextCell.Id == "O" {
 		m.oxygenDistance = len(m.explores)
 	}
 

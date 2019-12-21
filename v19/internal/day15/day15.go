@@ -103,11 +103,11 @@ func (p *Droid) probe(loc maze.Coord, dir maze.Dir) (*maze.Cell, error) {
 		cellId = "."
 		p.loc = loc
 	}
-	if current := p.maze.At(loc.X, loc.Y); current != nil {
+	if current := p.maze.At(loc); current != nil {
 		return current, nil
 	}
 	c := maze.NewCell(cellId, p.maze, loc, result != 0)
-	if err := p.maze.Set(loc.X, loc.Y, c); err != nil {
+	if err := p.maze.Set(loc, c); err != nil {
 		return nil, fmt.Errorf("Error setting cell %v at %v: %s\n", c, loc, err)
 	}
 	return c, nil
@@ -121,7 +121,7 @@ var dirToCommand = map[maze.Dir]int {
 }
 
 func flood(m *maze.Maze, loc maze.Coord) (int, error) {
-	start := m.At(loc.X, loc.Y)
+	start := m.At(loc)
 	start.Traversable = false
 	front := []*maze.Cell{start}
 	ticks := 0

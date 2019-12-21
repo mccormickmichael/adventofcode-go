@@ -47,6 +47,26 @@ type Coord struct {
 	X, Y int
 }
 
+func (c Coord) String() string {
+	return fmt.Sprintf("[%d, %d]", c.X, c.Y)
+}
+
+func (c Coord) Up() Coord {
+	return c.Move(0, -1)
+}
+
+func (c Coord) Right() Coord {
+	return c.Move(1, 0)
+}
+
+func (c Coord) Down() Coord {
+	return c.Move(0, 1)
+}
+
+func (c Coord) Left() Coord {
+	return c.Move(-1, 0)
+}
+
 func (c Coord) Move(x, y int) Coord {
 	return Coord{c.X + x, c.Y + y}
 }
@@ -56,8 +76,8 @@ func (c Coord) Distance(o Coord) int {
 	return intmath.Abs(o.X - c.X) + intmath.Abs(o.Y - c.Y)
 }
 
-type Celler interface {
-	At(x, y int) *Cell
+type Locator interface {
+	At(loc Coord) *Cell
 }
 
 func NewMaze(top, left, bottom, right int) *Maze {
@@ -77,21 +97,21 @@ type Maze struct {
 	cells [][]*Cell
 }
 
-func (m *Maze) At(x, y int) *Cell {
-	xo := x - m.xOffset
-	yo := y - m.yOffset
+func (m *Maze) At(loc Coord) *Cell {
+	xo := loc.X - m.xOffset
+	yo := loc.Y - m.yOffset
 	if xo < 0 || xo > m.xExtent || yo < 0 || yo > m.yExtent {
 		return nil
 	}
 	return m.cells[xo][yo]
 }
 
-func (m *Maze) Set(x, y int, c *Cell) error {
-	xo := x - m.xOffset
-	yo := y - m.yOffset
+func (m *Maze) Set(loc Coord, c *Cell) error {
+	xo := loc.X - m.xOffset
+	yo := loc.Y - m.yOffset
 	if xo < 0 || xo > m.xExtent || yo < 0 || yo > m.yExtent {
-		return errors.New(fmt.Sprintf("[%d, %d] not in maze extent [%d, %d, %d, %d]",
-			x, y, m.xOffset, m.yOffset, m.xExtent-m.xOffset, m.yExtent-m.yOffset))
+		return errors.New(fmt.Sprintf("%v not in maze extent [%d, %d, %d, %d]",
+			loc, m.xOffset, m.yOffset, m.xExtent-m.xOffset, m.yExtent-m.yOffset))
 	}
 	m.cells[xo][yo] = c
 

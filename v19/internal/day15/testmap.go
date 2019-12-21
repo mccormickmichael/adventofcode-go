@@ -46,7 +46,7 @@ func (m *TestMap) probe(loc maze.Coord, dir maze.Dir) (*maze.Cell, error) {
 	case maze.Right: loc.X+=1
 	}
 	c := m.cells[loc.X][loc.Y]
-	err := m.maze.Set(loc.X, loc.Y, c)
+	err := m.maze.Set(loc, c)
 	if err != nil {
 		return nil, fmt.Errorf("error setting cell %v: %s", c, err)
 	}
