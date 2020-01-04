@@ -18,25 +18,30 @@ func (d day18) Part1() {
 	theMaze := mapper.build(input.Lines(d.Path))
 
 	theMaze.Render(d.Output)
-	//_, _ = fmt.Fprintf(d.Output, "Entrance: %s\n", mapper.entrance)
-	//for name, door := range mapper.doors() {
-	//	_, _ = fmt.Fprintf(d.Output, "door[%s]: %s\n", name, door.loc)
+	//_, _ = fmt.Fprintln(d.Output)
+	//for _, key := range mapper.keys() {
+	//	_, _ = fmt.Fprintf(d.Output, " key[%s]: %s => %s\n", key.name, key.loc, key.door.loc)
 	//}
-	_, _ = fmt.Fprintln(d.Output)
-	for _, key := range mapper.keys() {
-		_, _ = fmt.Fprintf(d.Output, " key[%s]: %s\n", key.name, key.loc)
+	//_, _ = fmt.Fprintln(d.Output)
+
+	vault := &Vault{theMaze, mapper.keys(), mapper.doors()}
+	elf := &Elf{mapper.entrance, []Key{}}
+
+	rootScenario := &scenario{vault, elf, "", 0}
+	solver := newPathSolver(rootScenario)
+
+	for solver.remaining() > 0 {
+		solver.pop().resolve(solver)
 	}
-	_, _ = fmt.Fprintln(d.Output)
 
-
-	rootScenario := &scenario{maze:theMaze, loc:mapper.entrance, outstandingKeys:mapper.keys()}
 	goals := newGoals(theMaze, rootScenario)
 	goals.find()
 	_, _ = fmt.Fprintln(d.Output, "Goals:")
 	for _, g := range goals.found {
-		_, _ = fmt.Fprintf(d.Output, "  %s%s -> %d\n", g.key.name, g.key.loc, g.dist)
+		_, _ = fmt.Fprintf(d.Output, "  %s%s (%d)\n", g.key.name, g.key.loc, g.dist)
 	}
 }
+
 
 func (d day18) Part2() {
 

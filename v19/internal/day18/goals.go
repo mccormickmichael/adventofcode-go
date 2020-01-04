@@ -32,22 +32,22 @@ func newGoals(maze *mz.Maze, scenario *scenario) *goals {
 func (g *goals) find() {
 
 	for len(g.pending) > 0 && len(g.open) > 0 {
-		newp := make(map[mz.Coord]int, 0)
+		newPending := make(map[mz.Coord]int, 0)
 
 		for loc, dist := range g.pending {
 			for _, cell := range g.maze.At(loc).TraversableNeighbors() {
-				cloc := cell.Loc()
-				if md, ok := g.marked[cloc]; ok {
-					g.shortcut(cloc, md, dist + 1)
+				cellLoc := cell.Loc()
+				if markedDist, ok := g.marked[cellLoc]; ok {
+					g.shortcut(cellLoc, markedDist, dist + 1)
 				} else {
-					if !g.markGoal(cloc, dist + 1) {
-						newp[cloc] = dist + 1
+					if !g.markGoal(cellLoc, dist + 1) {
+						newPending[cellLoc] = dist + 1
 					}
 				}
 			}
 			g.marked[loc] = dist
 		}
-		g.pending = newp
+		g.pending = newPending
 	}
 }
 

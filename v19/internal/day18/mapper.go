@@ -44,6 +44,7 @@ func (m *mapper) build(layout []string) *maze.Maze {
 			_ = theMaze.Set(loc, cell)
 		}
 	}
+	m.resolveDoorsForKeys()
 	return theMaze
 }
 
@@ -66,5 +67,14 @@ func (m *mapper) parseCell(mz *maze.Maze, loc maze.Coord, b byte) (*maze.Cell, e
 		return maze.NewCell(name, mz, loc, true), nil
 	default:
 		return nil, fmt.Errorf("unknown cell type %b", b)
+	}
+}
+
+func (m *mapper) resolveDoorsForKeys() {
+	for keyName, key := range m.foundKeys {
+		doorName := string(key.name[0] - 32)
+		if door, ok := m.foundDoors[doorName]; ok {
+			m.foundKeys[keyName] = Key{key.name, key.loc, door}
+		}
 	}
 }
